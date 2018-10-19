@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' //version '1.2.71'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.71'
 }
 
 group 'ca.llamabagel'
@@ -7,10 +7,14 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    google()
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    implementation "androidx.room:room-runtime:2.1.0-alpha01"
+    implementation 'com.google.code.gson:gson:2.8.4'
 }
 
 compileKotlin {
