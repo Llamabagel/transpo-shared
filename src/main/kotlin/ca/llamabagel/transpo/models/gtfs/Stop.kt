@@ -1,5 +1,8 @@
 package ca.llamabagel.transpo.models.gtfs
 
+/**
+ * [https://developers.google.com/transit/gtfs/reference/#stopstxt]
+ */
 data class Stop(val id: String,
                 val code: String?,
                 val name: String,
