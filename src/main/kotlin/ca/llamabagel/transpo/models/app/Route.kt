@@ -1,11 +1,12 @@
-package ca.llamabagel.transpo.models.transit
+package ca.llamabagel.transpo.models.app
 
 import androidx.room.ColumnInfo
+import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 /**
- * A transit route.
+ * A app route.
  *
  * @property id The unique id string for this route.
  * @property shortName A short name for this route (typically just the route number)
@@ -13,6 +14,7 @@ import com.google.gson.annotations.SerializedName
  * @property fromHeading The typical heading of the origin point of this route
  * @property toHeading The typical heading of the destination point of this route
  */
+@Entity(tableName = "routes")
 data class Route(
         @PrimaryKey @ColumnInfo(name = "id") @SerializedName("id") val id: String,
         @ColumnInfo(name = "shortName") @SerializedName("shortName") val shortName: String,

@@ -1,7 +1,7 @@
 package ca.llamabagel.transpo.models.gtfs
 
 /**
- * [https://developers.google.com/transit/gtfs/reference/#agencytxt]
+ * [https://developers.google.com/app/gtfs/reference/#agencytxt]
  */
 data class Agency(val id: String,
                   val name: String,

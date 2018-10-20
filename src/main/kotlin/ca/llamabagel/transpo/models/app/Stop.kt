@@ -1,4 +1,4 @@
-package ca.llamabagel.transpo.models.transit
+package ca.llamabagel.transpo.models.app
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

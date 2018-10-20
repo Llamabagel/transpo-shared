@@ -1,7 +1,7 @@
 package ca.llamabagel.transpo.models.gtfs
 
 /**
- * [https://developers.google.com/transit/gtfs/reference/#calendartxt]
+ * [https://developers.google.com/app/gtfs/reference/#calendartxt]
  */
 data class Calendar(val serviceId: String,
                     val monday: Int,
