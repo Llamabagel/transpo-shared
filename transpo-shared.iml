@@ -17,6 +17,7 @@
         <compilerSettings />
         <compilerArguments>
           <option name="destination" value="$MODULE_DIR$/build/classes/kotlin/main" />
+          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.2.71/5470d1f752cd342edb77e1062bac07e838d2cea4/kotlin-stdlib-jdk8-1.2.71.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.room/room-runtime/2.1.0-alpha01/30d8d0a93ccf140c424132792a5f08bf8acfe7ef/room-runtime-2.1.0-alpha01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.4/d0de1ca9b69e69d1d497ee3c6009d015f64dad57/gson-2.8.4.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.2.71/4ce93f539e2133f172f1167291a911f83400a5d0/kotlin-stdlib-jdk7-1.2.71.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.2.71/d9717625bb3c731561251f8dd2c67a1011d6764c/kotlin-stdlib-1.2.71.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.room/room-common/2.1.0-alpha01/be2603c40d004562850e5c48f1bd0dd732b0004a/room-common-2.1.0-alpha01.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.sqlite/sqlite-framework/2.0.0/7fcc2e9b36eca17936fc10629d52d00649c68b1d/sqlite-framework-2.0.0.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.sqlite/sqlite/2.0.0/eabae6b64c87ae3c383f3114b427b9abe4dea1f5/sqlite-2.0.0.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.arch.core/core-runtime/2.0.1-alpha01/3753b829cf75589f4a0cfaf336dc66baa94b216d/core-runtime-2.0.1-alpha01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.legacy/legacy-support-core-utils/1.0.0-rc01/c636b3ae4ad5db23f8e403138d05a97d723bd86b/legacy-support-core-utils-1.0.0-rc01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.2.71/ba18ca1aa0e40eb6f1865b324af2f4cbb691c1ec/kotlin-stdlib-common-1.2.71.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.arch.core/core-common/2.0.0/bb21b9a11761451b51624ac428d1f1bb5deeac38/core-common-2.0.0.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.loader/loader/1.0.0-rc01/d1c87794bbad9c5f0d0b151c746c0bc0d19c7b34/loader-1.0.0-rc01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.core/core/1.0.0-rc01/67e4bf90e61b2864efd18e0e1f208b719b393cd9/core-1.0.0-rc01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.documentfile/documentfile/1.0.0-rc01/60fb0576dc6e6cd8e7aa70bd8d655407e0fda083/documentfile-1.0.0-rc01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.localbroadcastmanager/localbroadcastmanager/1.0.0-rc01/81664d602e7bcdf7fe894697e7228d3ff1f4394a/localbroadcastmanager-1.0.0-rc01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.print/print/1.0.0-rc01/316b4e58249fb75ae17568e1d9ce0199ec9f3c10/print-1.0.0-rc01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.versionedparcelable/versionedparcelable/1.0.0-rc01/d61a54dde48aad5025ba187735a8027ee6738e0b/versionedparcelable-1.0.0-rc01.aar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.collection/collection/1.0.0-rc01/a6f2dcbb844fe194f0ea37bc327a3ffab0de9e4f/collection-1.0.0-rc01.jar;C:/Users/derek/.gradle/caches/modules-2/files-2.1/androidx.annotation/annotation/1.0.0/45599f2cd5965ac05a1488fa2a5c0cdd7c499ead/annotation-1.0.0.jar" />
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
           <option name="moduleName" value="transpo-shared" />
@@ -51,10 +52,26 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-jdk8-1.2.51" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-jdk7-1.2.51" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-1.2.51" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-common-1.2.51" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-jdk8-1.2.71" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: room-runtime-2.1.0-alpha01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: gson-2.8.4" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-jdk7-1.2.71" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-1.2.71" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: room-common-2.1.0-alpha01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: sqlite-framework-2.0.0" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: sqlite-2.0.0" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: core-runtime-2.0.1-alpha01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: legacy-support-core-utils-1.0.0-rc01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-common-1.2.71" level="project" />
     <orderEntry type="library" exported="" name="Gradle: annotations-13.0" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: core-common-2.0.0" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: loader-1.0.0-rc01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: core-1.0.0-rc01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: documentfile-1.0.0-rc01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: localbroadcastmanager-1.0.0-rc01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: print-1.0.0-rc01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: versionedparcelable-1.0.0-rc01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: collection-1.0.0-rc01" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: annotation-1.0.0" level="project" />
   </component>
 </module>
