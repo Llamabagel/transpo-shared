@@ -15,15 +15,17 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by derek on 8/4/2017.
  * A trip. A bus. Something that will arrive at your bus stop!
- * @param destination The final destination of the trip
- * @param startTime The time the trip started/will start. A unique identifier for a trip.
- * @param adjustedScheduleTime The number of minutes until the trip arrives
- * @param adjustmentAge The number of minutes ago the info was updated. -1 if the trip is not gps updated
- * @param lastTripOfSchedule Whether this bus is the last trip on a route
- * @param busType The type of bus being used
- * @param latitude Latitude of the location of the bus
- * @param longitude Longitude of the location of the bus
- * @param gpsSpeed The current speed of the bus
+ * @property destination The final destination of the trip
+ * @property startTime The time the trip started/will start. A unique identifier for a trip.
+ * @property adjustedScheduleTime The number of minutes until the trip arrives.
+ * @property adjustmentAge The number of minutes ago the info was updated. -1 if the trip is not gps updated
+ * @property lastTripOfSchedule Whether this bus is the last trip of a route for the day.
+ * @property busType The type of bus being used.
+ * @property latitude Latitude of the location of the bus. Could be null if [adjustmentAge] is -1.
+ * @property longitude Longitude of the location of the bus. Could be null if [adjustmentAge] is -1.
+ * @property gpsSpeed The current speed of the bus. Could be null if [adjustmentAge] is -1.
+ * @property hasBikeRack Whether this bus is equipped with a bike rack.
+ * @property punctuality A measure, in minutes, of how far off this trip's [adjustedScheduleTime] is from its scheduled time.
  */
 
 data class Trip(
@@ -33,10 +35,11 @@ data class Trip(
         @SerializedName("adjustmentAge") val adjustmentAge: Float,
         @SerializedName("lastTripOfSchedule") val lastTripOfSchedule: Boolean,
         @SerializedName("busType") val busType: String,
-        @SerializedName("latitude") val latitude: Double,
-        @SerializedName("longitude") val longitude: Double,
-        @SerializedName("gpsSpeed") val gpsSpeed: Float,
-        @SerializedName("hasBikeRack") val hasBikeRack: Boolean
+        @SerializedName("latitude") val latitude: Double?,
+        @SerializedName("longitude") val longitude: Double?,
+        @SerializedName("gpsSpeed") val gpsSpeed: Float?,
+        @SerializedName("hasBikeRack") val hasBikeRack: Boolean,
+        @SerializedName("punctuality") val punctuality: Int
 ) {
 
     /**
@@ -59,8 +62,8 @@ data class Trip(
 
     /**
      * Gets the location of this bus in a LatLng object.
-     * @return The LatLng object for this trip's latitude and longitude
+     * @return A LatLng object of this trip's latitude and longitude, or null if the location does not exist.
      */
-    fun getLocation() = LatLng(latitude, longitude)
+    fun getLocation() = if (latitude != null && longitude != null) LatLng(latitude, longitude) else null
 
 }
