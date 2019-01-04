@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Llamabagel.
+ * Copyright (c) 2019 Llamabagel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ca.llamabagel.transpo.models.plans.request
+package ca.llamabagel.transpo.models.plans.response
 
-import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
-import java.util.*
 
-data class PlansRequest(
-        @SerializedName("locations") val locations: List<Location>,
-        @SerializedName("date") val date: Date,
-        @SerializedName("allowBike") val allowBike: Boolean = false,
-        @SerializedName("requestTimeType") val requestTimeType: RequestTimeType = RequestTimeType.DEPART_AT
-)
+data class Plan(@SerializedName("summary") val summary: PlanSummary,
+                @SerializedName("steps") val steps: List<Step>)
