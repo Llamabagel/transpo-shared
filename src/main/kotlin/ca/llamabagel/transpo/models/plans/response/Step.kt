@@ -17,12 +17,8 @@
 
 package ca.llamabagel.transpo.models.plans.response
 
-import com.google.gson.*
 import com.google.gson.annotations.SerializedName
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
-import java.lang.reflect.Type
 import java.util.*
 
 /**
@@ -100,6 +96,10 @@ sealed class StepDetails {
                            @SerializedName("duration") val duration: Int) : StepDetails()
 }
 
+/**
+ * TypeAdapterFactory for serializing and deserializing [StepDetails] objects.
+ * @see StepDetails
+ */
 val stepDetailsTypeFactory: RuntimeTypeAdapterFactory<StepDetails> = RuntimeTypeAdapterFactory
         .of(StepDetails::class.java, "type")
         .registerSubtype(StepDetails.StopDetails::class.java, "stop")
