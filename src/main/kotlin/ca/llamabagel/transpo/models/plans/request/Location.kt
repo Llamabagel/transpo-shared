@@ -18,13 +18,26 @@
 package ca.llamabagel.transpo.models.plans.request
 
 import ca.llamabagel.transpo.models.LatLng
+import ca.llamabagel.transpo.models.app.Stop
 import com.google.gson.*
 import com.google.gson.annotations.SerializedName
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
 import java.lang.reflect.Type
 
 
-data class Location(@SerializedName("description") val description: String?,
-                    @SerializedName("placeId") val placeId: String?,
-                    @SerializedName("latLng") val latLng: LatLng?)
+sealed class Location(@SerializedName("description") val description: String?) {
+
+    class PlaceLocation(@SerializedName("placeId") val placeId: String, description: String?) : Location(description)
+
+    class LatLngLocation(@SerializedName("latLng") val latLng: LatLng, description: String?) : Location(description)
+
+    class StopLocation(@SerializedName("stop") val stop: Stop) : Location(stop.name)
+
+}
+
+val locationTypeFactory: RuntimeTypeAdapterFactory<Location> = RuntimeTypeAdapterFactory.of(Location::class.java, "type")
+        .registerSubtype(Location.PlaceLocation::class.java, "place")
+        .registerSubtype(Location.LatLngLocation::class.java, "latLng")
+        .registerSubtype(Location.StopLocation::class.java, "stop")

@@ -23,7 +23,7 @@ import java.util.*
 
 data class PlansRequest(
         @SerializedName("locations") val locations: List<Location>,
-        @SerializedName("date") val date: Date,
+        @SerializedName("date") val date: Date = Date(),
         @SerializedName("allowBike") val allowBike: Boolean = false,
         @SerializedName("requestTimeType") val requestTimeType: RequestTimeType = RequestTimeType.DEPART_AT
 )
