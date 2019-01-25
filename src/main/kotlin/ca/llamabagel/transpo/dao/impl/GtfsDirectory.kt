@@ -14,14 +14,11 @@ import java.nio.file.Paths
  */
 class GtfsDirectory(val path: String) {
 
-    val stopsDao: StopDao = StopsFile()
-    val routesDao: RouteDao = RoutesFile()
-
     /**
      * GTFS directory and stops.txt implementation of the StopDao.
      * Reads the stops.txt file from a GTFS directory for its methods.
      */
-    internal inner class StopsFile : StopDao {
+    val stops = object : StopDao {
 
         /**
          * Creates a [Stop] object from the parts off a line of a csv file.
@@ -72,18 +69,18 @@ class GtfsDirectory(val path: String) {
             return stops
         }
 
-        override fun insert(t: Stop) {
+        override fun insert(vararg t: Stop): Boolean {
             TODO("not implemented")
             /*Files.write(Paths.get("$path/stops.txt"),
                     "${t.id},${t.code},${t.name},${t.description},${t.latitude},${t.longitude},${t.zoneId},${t.stopUrl},${t.locationType}".toByteArray(),
                     StandardOpenOption.APPEND)*/
         }
 
-        override fun update(t: Stop) {
+        override fun update(vararg t: Stop): Boolean {
             TODO("not implemented")
         }
 
-        override fun delete(t: Stop) {
+        override fun delete(vararg t: Stop): Boolean {
             TODO("not implemented")
         }
 
@@ -93,7 +90,7 @@ class GtfsDirectory(val path: String) {
      * GTFS directory and stops.txt implementation of the RouteDao.
      * Reads the routes.txt file from a GTFS directory for its methods.
      */
-    internal inner class RoutesFile : RouteDao {
+    val routes = object : RouteDao {
 
         /**
          * Creates a [Route] object from the parts off a line of a csv file.
@@ -103,7 +100,7 @@ class GtfsDirectory(val path: String) {
          */
         private fun makeRouteFromCsv(parts: List<String>) =
                 Route(parts[0], null, parts[1], parts[2], parts[3], parts[4].toInt(),
-                    parts[6], null, null, null)
+                        parts[6], null, null, null)
 
 
         override fun getByNumber(number: String): Route? {
@@ -145,17 +142,18 @@ class GtfsDirectory(val path: String) {
             return routes
         }
 
-        override fun insert(t: Route) {
+        override fun insert(vararg t: Route): Boolean {
             TODO("not implemented")
         }
 
-        override fun update(t: Route) {
+        override fun update(vararg t: Route): Boolean {
             TODO("not implemented")
         }
 
-        override fun delete(t: Route) {
+        override fun delete(vararg t: Route): Boolean {
             TODO("not implemented")
         }
 
     }
+
 }

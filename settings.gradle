@@ -2,7 +2,7 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (!plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
-                useVersion("1.2.71")
+                useVersion("1.3.20")
             }
         }
     }

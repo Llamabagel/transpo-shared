@@ -1,4 +1,4 @@
-package ca.llamabagel.transpo.dao.gtfs
+package ca.llamabagel.transpo.dao
 
 /**
  * A base Dao interface that contains the definitions
@@ -19,26 +19,29 @@ interface Dao<T> {
     /**
      * Insert a [T] into the data source.
      *
-     * @param t The object to insert.
+     * @param t One or more objects to insert.
+     * @return true if the given items were all inserted successfully, false if not
      */
-    fun insert(t: T)
+    fun insert(vararg t: T): Boolean
 
     /**
      * Updates a [T] in the data source.
      * The identifying property that determines which object is actually updated
      * depends on the implementation.
      *
-     * @param t The object to update.
+     * @param t One or more objects to update.
+     * @return true if the given items were all updated successfully, false if not
      */
-    fun update(t: T)
+    fun update(vararg t: T): Boolean
 
     /**
      * Deletes a [T] in the data source.
      * The identifying property that determines which object is actually deleted
      * depends on the implementation.
      *
-     * @param t The object to delete.
+     * @param t One or more objects to delete.
+     * @return true if the given items were all deleted successfully, false if not
      */
-    fun delete(t: T)
+    fun delete(vararg t: T): Boolean
 
 }
