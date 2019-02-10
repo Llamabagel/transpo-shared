@@ -1,8 +1,7 @@
 package ca.llamabagel.transpo.dao.impl
 
 import ca.llamabagel.transpo.dao.gtfs.*
-import ca.llamabagel.transpo.models.gtfs.Route
-import ca.llamabagel.transpo.models.gtfs.Stop
+import ca.llamabagel.transpo.models.gtfs.*
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -224,15 +223,139 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         )
     }
 
-    override val agencies: AgencyDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val agencies: AgencyDao = object : AgencyDao {
+        override fun getById(id: String): Agency? {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
 
-    override val calendars: CalendarDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        override fun getAll(): List<Agency> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
 
-    override val calendarDates: CalendarDateDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        override fun insert(vararg t: Agency): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
 
-    override val stopTimes: StopTimeDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        override fun update(vararg t: Agency): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
 
-    override val trips: TripDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        override fun delete(vararg t: Agency): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+    }
+
+    override val calendars: CalendarDao = object : CalendarDao {
+        override fun getByServiceId(serviceId: String): Calendar? {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getByDays(monday: Int, tuesday: Int, wednesday: Int, thursday: Int, friday: Int, saturday: Int, sunday: Int): List<Calendar> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getAll(): List<Calendar> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun insert(vararg t: Calendar): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun update(vararg t: Calendar): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun delete(vararg t: Calendar): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+    }
+
+    override val calendarDates: CalendarDateDao = object : CalendarDateDao {
+        override fun getByServiceId(serviceId: String): List<CalendarDate> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getByDate(date: String): List<CalendarDate> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getAll(): List<CalendarDate> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun insert(vararg t: CalendarDate): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun update(vararg t: CalendarDate): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun delete(vararg t: CalendarDate): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+    }
+
+    override val stopTimes: StopTimeDao = object : StopTimeDao {
+        override fun getByTrip(trip: Trip): List<StopTime> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getByStop(stop: Stop): List<StopTime> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getAll(): List<StopTime> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun insert(vararg t: StopTime): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun update(vararg t: StopTime): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun delete(vararg t: StopTime): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+    }
+
+    override val trips: TripDao = object : TripDao {
+        override fun getByRoute(route: Route): List<Trip> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getByRoute(route: Route, directionId: Int): List<Trip> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getTripById(id: String): Trip? {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getByServiceId(serviceId: String): List<Trip> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getAll(): List<Trip> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun insert(vararg t: Trip): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun update(vararg t: Trip): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun delete(vararg t: Trip): Boolean {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+    }
 
     /**
      * Performs a specified set of database operations using a [PreparedStatement] as a transaction.
@@ -251,7 +374,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
         // Execute
         val result = this.use { it.executeBatch() }
-        val success = result.contains(PreparedStatement.EXECUTE_FAILED)
+        val success = !result.contains(PreparedStatement.EXECUTE_FAILED)
 
         if (success) { connection.commit() }
 
