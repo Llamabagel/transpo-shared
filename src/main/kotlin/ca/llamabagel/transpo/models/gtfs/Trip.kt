@@ -1,9 +1,9 @@
 package ca.llamabagel.transpo.models.gtfs
 
 /**
- * [https://developers.google.com/app/gtfs/reference/#tripstxt]
+ * [https://developers.google.com/transit/gtfs/reference/#tripstxt]
  */
-data class Trip(val id: String,
+data class Trip(val routeId: String,
                 val serviceId: String,
                 val tripId: String,
                 val headsign: String?,

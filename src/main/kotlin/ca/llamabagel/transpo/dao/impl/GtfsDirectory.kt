@@ -1,7 +1,6 @@
 package ca.llamabagel.transpo.dao.impl
 
-import ca.llamabagel.transpo.dao.gtfs.RouteDao
-import ca.llamabagel.transpo.dao.gtfs.StopDao
+import ca.llamabagel.transpo.dao.gtfs.*
 import ca.llamabagel.transpo.models.gtfs.Route
 import ca.llamabagel.transpo.models.gtfs.Stop
 import java.nio.file.Files
@@ -12,13 +11,13 @@ import java.nio.file.Paths
  *
  * @property path The path to the directory containing the GTFS files
  */
-class GtfsDirectory(val path: String) {
+class GtfsDirectory(val path: String) : GtfsSource() {
 
     /**
      * GTFS directory and stops.txt implementation of the StopDao.
      * Reads the stops.txt file from a GTFS directory for its methods.
      */
-    val stops = object : StopDao {
+    override val stops = object : StopDao {
 
         /**
          * Creates a [Stop] object from the parts off a line of a csv file.
@@ -90,7 +89,7 @@ class GtfsDirectory(val path: String) {
      * GTFS directory and stops.txt implementation of the RouteDao.
      * Reads the routes.txt file from a GTFS directory for its methods.
      */
-    val routes = object : RouteDao {
+    override val routes = object : RouteDao {
 
         /**
          * Creates a [Route] object from the parts off a line of a csv file.
@@ -155,5 +154,15 @@ class GtfsDirectory(val path: String) {
         }
 
     }
+
+    override val agencies: AgencyDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override val calendars: CalendarDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override val calendarDates: CalendarDateDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override val stopTimes: StopTimeDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override val trips: TripDao = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
 }
