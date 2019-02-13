@@ -303,7 +303,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                 url = resultSet.getString("url"),
                 name = resultSet.getString("name"),
                 timeZone = resultSet.getString("timeZone"),
-                language = resultSet.getString("langnuage"),
+                language = resultSet.getString("language"),
                 phone = resultSet.getString("phone"),
                 fareUrl = resultSet.getString("fareUrl"),
                 email = resultSet.getString("email")
