@@ -16,5 +16,4 @@ data class StopTime(val tripId: String,
                     val pickupType: Int?,
                     val dropOffType: Int?,
                     val shapeDistanceTraveled: Double?,
-                    val timepoint: Int?) {
-}
+                    val timepoint: Int?)

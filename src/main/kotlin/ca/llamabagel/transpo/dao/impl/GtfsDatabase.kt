@@ -2,6 +2,8 @@
  * Copyright (c) 2019 Derek Ellis. Subject to the MIT license.
  */
 
+@file:Suppress("Duplicates")
+
 package ca.llamabagel.transpo.dao.impl
 
 import ca.llamabagel.transpo.dao.gtfs.*
@@ -197,6 +199,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setString(7, i.color)
                     setString(8, i.textColor)
                     setObject(9, i.sortOrder, Types.INTEGER)
+                    setString(10, i.id)
                     addBatch()
                 }
             }
@@ -229,136 +232,514 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
     override val agencies: AgencyDao = object : AgencyDao {
         override fun getById(id: String): Agency? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM agencies WHERE id = ?")
+                    .apply {
+                        setString(1, id)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                if (it.next()) getAgencyFromResultSet(it) else null
+            }
         }
 
         override fun getAll(): List<Agency> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM agencies").executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getAgencyFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun insert(vararg t: Agency): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("INSERT INTO agencies VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.id)
+                    setString(2, i.name)
+                    setString(3, i.url)
+                    setString(4, i.timeZone)
+                    setString(5, i.language)
+                    setString(6, i.phone)
+                    setString(7, i.fareUrl)
+                    setString(8, i.email)
+                    addBatch()
+                }
+            }
         }
 
         override fun update(vararg t: Agency): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("UPDATE agencies SET name = ?, url = ?, timeZone = ?, language = ?, phone = ?, fareUrl = ?, email = ? WHERE id = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.name)
+                    setString(2, i.url)
+                    setString(3, i.timeZone)
+                    setString(4, i.language)
+                    setString(5, i.phone)
+                    setString(6, i.fareUrl)
+                    setString(7, i.email)
+                    setString(8, i.id)
+                    addBatch()
+                }
+            }
         }
 
         override fun delete(vararg t: Agency): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("DELETE FROM agencies WHERE id = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.id)
+                    statement.addBatch()
+                }
+            }
         }
+
+        private fun getAgencyFromResultSet(resultSet: ResultSet) = Agency(
+                id = resultSet.getString("id"),
+                url = resultSet.getString("url"),
+                name = resultSet.getString("name"),
+                timeZone = resultSet.getString("timeZone"),
+                language = resultSet.getString("langnuage"),
+                phone = resultSet.getString("phone"),
+                fareUrl = resultSet.getString("fareUrl"),
+                email = resultSet.getString("email")
+        )
     }
 
     override val calendars: CalendarDao = object : CalendarDao {
         override fun getByServiceId(serviceId: String): Calendar? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM calendars WHERE serviceId = ?")
+                    .apply {
+                        setString(1, serviceId)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                if (it.next()) getCalendarFromResultSet(it) else null
+            }
         }
 
         override fun getByDays(monday: Int, tuesday: Int, wednesday: Int, thursday: Int, friday: Int, saturday: Int, sunday: Int): List<Calendar> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            if (monday == -1 && tuesday == -1 && wednesday == -1 && thursday == -1 && friday == -1 && saturday == -1 && sunday == -1) {
+                return emptyList()
+            }
+
+            // Concatenation to avoid sql syntax check in this case
+            var sql = "SELECT * FROM calendars " + "WHERE "
+            if (monday != -1) sql += "monday = ? AND "
+            if (tuesday != -1) sql += "tuesday = ? AND "
+            if (wednesday != -1) sql += "wednesday = ? AND"
+            if (thursday != -1) sql += "thursday = ? AND"
+            if (friday != -1) sql += "friday = ? AND"
+            if (saturday != -1) sql += "saturday = ? AND"
+            if (sunday != -1) sql += "sunday = ? AND"
+            sql = sql.removeSuffix("AND")
+
+            val result = connection.prepareStatement(sql)
+                    .apply {
+                        var c = 1 // Current parameter position
+                        if (monday != -1) setInt(c++, monday)
+                        if (tuesday != -1) setInt(c++, tuesday)
+                        if (wednesday != -1) setInt(c++, wednesday)
+                        if (thursday != -1) setInt(c++, thursday)
+                        if (friday != -1) setInt(c++, friday)
+                        if (saturday != -1) setInt(c++, saturday)
+                        if (sunday != -1) setInt(c, sunday)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence {
+                    if (it.next()) getCalendarFromResultSet(it) else null
+                }.toList()
+            }
         }
 
         override fun getAll(): List<Calendar> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM calendars").executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getCalendarFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun insert(vararg t: Calendar): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("INSERT INTO calendars VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.serviceId)
+                    setInt(2, i.monday)
+                    setInt(3, i.tuesday)
+                    setInt(4, i.wednesday)
+                    setInt(5, i.thursday)
+                    setInt(6, i.friday)
+                    setInt(7, i.saturday)
+                    setInt(8, i.sunday)
+                    setString(9, i.startDate)
+                    setString(10, i.endDate)
+
+                    addBatch()
+                }
+            }
         }
 
         override fun update(vararg t: Calendar): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("UPDATE calendars SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, friday = ?, saturday = ?, sunday = ?, startDate = ?, endDate = ? WHERE serviceId = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setInt(1, i.monday)
+                    setInt(2, i.tuesday)
+                    setInt(3, i.wednesday)
+                    setInt(4, i.thursday)
+                    setInt(5, i.friday)
+                    setInt(6, i.saturday)
+                    setInt(7, i.sunday)
+                    setString(8, i.startDate)
+                    setString(9, i.endDate)
+                    setString(10, i.serviceId)
+
+                    addBatch()
+                }
+            }
         }
 
         override fun delete(vararg t: Calendar): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("DELETE FROM calendars WHERE serviceId = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.serviceId)
+                    statement.addBatch()
+                }
+            }
         }
+
+        private fun getCalendarFromResultSet(resultSet: ResultSet) = Calendar(
+                serviceId = resultSet.getString("serviceId"),
+                monday = resultSet.getInt("monday"),
+                tuesday = resultSet.getInt("tuesday"),
+                wednesday = resultSet.getInt("wednesday"),
+                thursday = resultSet.getInt("thursday"),
+                friday = resultSet.getInt("friday"),
+                saturday = resultSet.getInt("saturday"),
+                sunday = resultSet.getInt("sunday"),
+                startDate = resultSet.getString("startDate"),
+                endDate =resultSet.getString("endDate")
+        )
     }
 
     override val calendarDates: CalendarDateDao = object : CalendarDateDao {
         override fun getByServiceId(serviceId: String): List<CalendarDate> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM calendarDates WHERE serviceId = ?")
+                    .apply {
+                        setString(1, serviceId)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getCalendarDateFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun getByDate(date: String): List<CalendarDate> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM calendarDates WHERE date = ?")
+                    .apply {
+                        setString(1, date)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getCalendarDateFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun getAll(): List<CalendarDate> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM calendarDates")
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getCalendarDateFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun insert(vararg t: CalendarDate): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("INSERT INTO calendarDates VALUES (?, ?, ?)")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.serviceId)
+                    setString(2, i.date)
+                    setInt(3, i.exceptionType)
+
+                    addBatch()
+                }
+            }
         }
 
         override fun update(vararg t: CalendarDate): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("UPDATE calendarDates SET exceptionType = ? WHERE serviceId = ? AND date = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setInt(1, i.exceptionType)
+                    setString(2, i.serviceId)
+                    setString(3, i.date)
+
+                    addBatch()
+                }
+            }
         }
 
         override fun delete(vararg t: CalendarDate): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("DELETE FROM calendarDates WHERE serviceId = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.serviceId)
+                    statement.addBatch()
+                }
+            }
         }
+
+        private fun getCalendarDateFromResultSet(resultSet: ResultSet) = CalendarDate(
+                serviceId = resultSet.getString("serviceId"),
+                date = resultSet.getString("date"),
+                exceptionType = resultSet.getInt("exceptionType")
+        )
     }
 
     override val stopTimes: StopTimeDao = object : StopTimeDao {
         override fun getByTrip(trip: Trip): List<StopTime> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM stopTimes WHERE tripId = ?")
+                    .apply {
+                        setString(1, trip.tripId)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getStopTimeFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun getByStop(stop: Stop): List<StopTime> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM stopTimes WHERE stopId = ?")
+                    .apply {
+                        setString(1, stop.id)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getStopTimeFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun getAll(): List<StopTime> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM stopTimes")
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getStopTimeFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun insert(vararg t: StopTime): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("INSERT INTO stopTimes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.tripId)
+                    setString(2, i.arrivalTime)
+                    setString(3, i.departureTime)
+                    setString(4, i.stopId)
+                    setInt(5, i.stopSequence)
+                    setString(6, i.stopHeadsign)
+                    setObject(7, i.pickupType, Types.INTEGER)
+                    setObject(8, i.dropOffType, Types.INTEGER)
+                    setObject(9, i.shapeDistanceTraveled, Types.DOUBLE)
+                    setObject(10, i.timepoint, Types.INTEGER)
+
+                    addBatch()
+                }
+            }
         }
 
         override fun update(vararg t: StopTime): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("UPDATE stopTimes SET arrivalTime = ?, departureTime = ?, stopSequence = ?, stopHeadsign = ?, pickupType = ?, dropOffType = ?, shapeDistanceTraveled = ?, timepoint = ? WHERE tripId = ? AND stopId = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.arrivalTime)
+                    setString(2, i.departureTime)
+                    setInt(3, i.stopSequence)
+                    setString(4, i.stopHeadsign)
+                    setObject(5, i.pickupType, Types.INTEGER)
+                    setObject(6, i.dropOffType, Types.INTEGER)
+                    setObject(7, i.shapeDistanceTraveled, Types.DOUBLE)
+                    setObject(8, i.timepoint, Types.INTEGER)
+                    setString(9, i.tripId)
+                    setString(10, i.stopId)
+
+                    addBatch()
+                }
+            }
         }
 
         override fun delete(vararg t: StopTime): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("DELETE FROM stopTimes WHERE tripId = ? AND stopId = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.tripId)
+                    setString(2, i.stopId)
+                    statement.addBatch()
+                }
+            }
         }
+
+        private fun getStopTimeFromResultSet(resultSet: ResultSet) = StopTime(
+                tripId = resultSet.getString("tripId"),
+                arrivalTime = resultSet.getString("arrivalTime"),
+                departureTime = resultSet.getString("departureTime"),
+                stopId = resultSet.getString("stopId"),
+                stopSequence = resultSet.getInt("stopSequence"),
+                stopHeadsign = resultSet.getString("stopHeadsign"),
+                pickupType = resultSet.getInt("pickupType"),
+                dropOffType = resultSet.getInt("dropOffType"),
+                shapeDistanceTraveled = resultSet.getDouble("shapeDistanceTraveled"),
+                timepoint = resultSet.getInt("timepoint")
+        )
     }
 
     override val trips: TripDao = object : TripDao {
         override fun getByRoute(route: Route): List<Trip> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM trips WHERE routeId = ?")
+                    .apply {
+                        setString(1, route.id)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getTripFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun getByRoute(route: Route, directionId: Int): List<Trip> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM trips WHERE routeId = ? AND directionId = ?")
+                    .apply {
+                        setString(1, route.id)
+                        setInt(2, directionId)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getTripFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun getTripById(id: String): Trip? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM trips WHERE tripId = ?")
+                    .apply {
+                        setString(1, id)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                if (it.next()) getTripFromResultSet(it) else null
+            }
         }
 
         override fun getByServiceId(serviceId: String): List<Trip> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM trips WHERE serviceId = ?")
+                    .apply {
+                        setString(1, serviceId)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getTripFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun getAll(): List<Trip> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val result = connection.prepareStatement("SELECT * FROM trips")
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getTripFromResultSet(it) else null }.toList()
+            }
         }
 
         override fun insert(vararg t: Trip): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("INSERT INTO trips VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.routeId)
+                    setString(2, i.serviceId)
+                    setString(3, i.tripId)
+                    setString(4, i.headsign)
+                    setString(5, i.shortName)
+                    setObject(6, i.directionId, Types.INTEGER)
+                    setObject(7, i.blockId, Types.INTEGER)
+                    setString(8, i.shapeId)
+                    setObject(9, i.wheelchairAccessible, Types.INTEGER)
+                    setObject(10, i.bikesAllowed, Types.INTEGER)
+
+                    addBatch()
+                }
+            }
         }
 
         override fun update(vararg t: Trip): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("UPDATE trips SET routeId = ?, serviceId = ?, headsign = ?, shortName = ?, directionId = ?, blockId = ?, shapeId = ?, wheelchairAccessible =  ?, bikesAllowed = ? WHERE tripId = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.routeId)
+                    setString(2, i.serviceId)
+                    setString(3, i.headsign)
+                    setString(4, i.shortName)
+                    setObject(5, i.directionId, Types.INTEGER)
+                    setObject(6, i.blockId, Types.INTEGER)
+                    setString(7, i.shapeId)
+                    setObject(8, i.wheelchairAccessible, Types.INTEGER)
+                    setObject(9, i.bikesAllowed, Types.INTEGER)
+                    setString(10, i.tripId)
+
+                    addBatch()
+                }
+            }
         }
 
         override fun delete(vararg t: Trip): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val statement = connection.prepareStatement("DELETE FROM trips WHERE tripId = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.tripId)
+                    statement.addBatch()
+                }
+            }
         }
+
+        private fun getTripFromResultSet(resultSet: ResultSet) = Trip(
+                routeId = resultSet.getString("routeId"),
+                serviceId = resultSet.getString("serviceId"),
+                tripId = resultSet.getString("tripId"),
+                headsign = resultSet.getString("headsign"),
+                shortName = resultSet.getString("shortName"),
+                directionId = resultSet.getInt("directionId"),
+                blockId = resultSet.getString("blockId"),
+                shapeId = resultSet.getString("shapeId"),
+                wheelchairAccessible = resultSet.getInt("wheelchairAccessible"),
+                bikesAllowed = resultSet.getInt("bikesAllowed")
+        )
     }
 
     /**
