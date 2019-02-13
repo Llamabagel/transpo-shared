@@ -21,8 +21,9 @@ dependencies {
     implementation "org.postgresql:postgresql:42.2.2"
 
     testImplementation 'junit:junit:4.12'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.25'
     testImplementation 'com.opentable.components:otj-pg-embedded:0.13.1'
-
+    testImplementation "org.flywaydb:flyway-core:5.2.4"
 }
 
 test {

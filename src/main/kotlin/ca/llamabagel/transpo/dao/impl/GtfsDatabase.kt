@@ -116,20 +116,32 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
 
-        private fun getStopFromResultSet(resultSet: ResultSet) = Stop(
-                id = resultSet.getString("id"),
-                code = resultSet.getString("code"),
-                name = resultSet.getString("name"),
-                description = resultSet.getString("description"),
-                latitude = resultSet.getDouble("latitude"),
-                longitude = resultSet.getDouble("longitude"),
-                zoneId = resultSet.getInt("zoneId"),
-                stopUrl = resultSet.getString("stopUrl"),
-                locationType = resultSet.getInt("locationType"),
-                parentStation = resultSet.getString("parentStation"),
-                timeZone = resultSet.getString("timeZone"),
-                wheelchairBoarding = resultSet.getInt("wheelchairBoarding")
-        )
+        private fun getStopFromResultSet(resultSet: ResultSet): Stop {
+            // Handle nullable Integers
+            var zoneId: Int? = resultSet.getInt("zoneId")
+            if (resultSet.wasNull()) zoneId = null
+
+            var locationType: Int? = resultSet.getInt("locationType")
+            if (resultSet.wasNull()) locationType = null
+
+            var wheelchairBoarding: Int? = resultSet.getInt("wheelchairBoarding")
+            if (resultSet.wasNull()) wheelchairBoarding = null
+
+            return Stop(
+                    id = resultSet.getString("id"),
+                    code = resultSet.getString("code"),
+                    name = resultSet.getString("name"),
+                    description = resultSet.getString("description"),
+                    latitude = resultSet.getDouble("latitude"),
+                    longitude = resultSet.getDouble("longitude"),
+                    zoneId = zoneId,
+                    stopUrl = resultSet.getString("stopUrl"),
+                    locationType = locationType,
+                    parentStation = resultSet.getString("parentStation"),
+                    timeZone = resultSet.getString("timeZone"),
+                    wheelchairBoarding = wheelchairBoarding
+            )
+        }
     }
 
     override val routes = object : RouteDao {
