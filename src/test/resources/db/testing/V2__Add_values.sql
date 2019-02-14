@@ -6,9 +6,9 @@ insert into stops (id, code, name, latitude, longitude) values ('AF975', '3031',
 insert into stops (id, code, name, latitude, longitude) values ('AF980', '3031', 'SMYTH 2A', -75.666591, 45.401167);
 
 -- Add route data
-insert into routes (id, shortName, type) values ('2-288', '2', 2);
-insert into routes (id, shortName, type) values ('5-288', '5', 3);
-insert into routes (id, shortName, type) values ('291-288', '291', 3);
+insert into routes (id, shortName, longName, type) values ('2-288', '2', '', 2);
+insert into routes (id, shortName, longName, type) values ('5-288', '5', '', 3);
+insert into routes (id, shortName, longName, type) values ('291-288', '291', '', 3);
 
 -- Add agency data
 insert into agencies (id, name, url, timezone) values (1, 'OC Transpo', 'http://www.octranspo.com', 'America/Montreal');

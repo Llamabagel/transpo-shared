@@ -182,7 +182,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.agencyId)
+                    setString(1, i.id)
                     setString(2, i.agencyId)
                     setString(3, i.shortName)
                     setString(4, i.longName)
@@ -228,18 +228,23 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        private fun getRouteFromResultSet(resultSet: ResultSet) = Route(
-                id = resultSet.getString("id"),
-                agencyId = resultSet.getString("agencyId"),
-                shortName = resultSet.getString("shortName"),
-                longName = resultSet.getString("longName"),
-                description = resultSet.getString("description"),
-                type = resultSet.getInt("type"),
-                url = resultSet.getString("url"),
-                color = resultSet.getString("color"),
-                textColor = resultSet.getString("textColor"),
-                sortOrder = resultSet.getInt("sortOrder")
-        )
+        private fun getRouteFromResultSet(resultSet: ResultSet): Route {
+            var sortOrder: Int? = resultSet.getInt("sortOrder")
+            if (resultSet.wasNull()) sortOrder = null
+
+            return Route(
+                    id = resultSet.getString("id"),
+                    agencyId = resultSet.getString("agencyId"),
+                    shortName = resultSet.getString("shortName"),
+                    longName = resultSet.getString("longName"),
+                    description = resultSet.getString("description"),
+                    type = resultSet.getInt("type"),
+                    url = resultSet.getString("url"),
+                    color = resultSet.getString("color"),
+                    textColor = resultSet.getString("textColor"),
+                    sortOrder = sortOrder
+            )
+        }
     }
 
     override val agencies: AgencyDao = object : AgencyDao {

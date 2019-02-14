@@ -4,6 +4,7 @@
 
 package ca.llamabagel.transpo.dao.impl
 
+import ca.llamabagel.transpo.models.gtfs.Route
 import ca.llamabagel.transpo.models.gtfs.Stop
 import com.opentable.db.postgres.embedded.FlywayPreparer
 import com.opentable.db.postgres.junit.EmbeddedPostgresRules
@@ -14,8 +15,10 @@ import org.junit.Test
 class GtfsDatabaseTest {
 
     @get:Rule
-    val postgres = EmbeddedPostgresRules.preparedDatabase(FlywayPreparer.forClasspathLocation("db/testing"))
+    val postgres = EmbeddedPostgresRules.preparedDatabase(FlywayPreparer.forClasspathLocation("db/testing"))!!
 
+
+     // GtfsDatabase.stops tests.
     @Test
     fun testStopGetById() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
@@ -77,6 +80,67 @@ class GtfsDatabaseTest {
         source.stops.insert(stop)
         assertTrue(source.stops.delete(stop))
         assertNull(source.stops.getById(stop.id))
+    }
+
+    // GtfsDatabase.routes tests
+    @Test
+    fun testRouteGetByNumber() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val route = source.routes.getByNumber("291")
+        assertNotNull(route)
+        assertTrue(route?.shortName == "291")
+    }
+
+    @Test
+    fun testRouteGetById() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val route = source.routes.getById("5-288")
+        assertNotNull(route)
+        assertTrue(route?.id == "5-288")
+    }
+
+    @Test
+    fun testRouteGetAll() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val routes = source.routes.getAll()
+        assertTrue(routes.size == 3)
+        assertNotNull(routes.find { route -> route.id == "2-288" })
+    }
+
+    @Test
+    fun testRouteInsert() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val route = Route("1-1", null, "1", "", null, 3, null, null, null, null)
+        assertTrue(source.routes.insert(route))
+        assertTrue(source.routes.getById(route.id) == route)
+    }
+
+    @Test
+    fun testRouteUpdate() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val route = Route("1-1", null, "1", "", null, 3, null, null, null, null)
+        source.routes.insert(route)
+
+        // Update each value except the id.
+        val newRoute = Route("1-1", "1", "1!", "Somewhere", "A Route", 2, "", "", "", 1)
+        source.routes.update(newRoute)
+        assertFalse(source.routes.getById(newRoute.id) == route)
+        assertTrue(source.routes.getById(newRoute.id) == newRoute)
+    }
+
+    @Test
+    fun testRouteDelete() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val route = Route("1-1", null, "1", "", null, 3, null, null, null, null)
+        source.routes.insert(route)
+        assertTrue(source.routes.delete(route))
+        assertNull(source.routes.getById(route.id))
     }
 
 }
