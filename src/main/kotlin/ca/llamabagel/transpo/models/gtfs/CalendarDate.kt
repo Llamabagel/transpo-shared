@@ -7,6 +7,6 @@ package ca.llamabagel.transpo.models.gtfs
 /**
  * [https://developers.google.com/app/gtfs/reference/#calendar_datestxt]
  */
-data class CalendarDate(val serviceId: String,
+data class CalendarDate(val serviceId: CalendarServiceId,
                         val date: String,
                         val exceptionType: Int)

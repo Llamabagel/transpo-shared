@@ -6,6 +6,7 @@ package ca.llamabagel.transpo.dao.gtfs
 
 import ca.llamabagel.transpo.dao.Dao
 import ca.llamabagel.transpo.models.gtfs.Stop
+import ca.llamabagel.transpo.models.gtfs.StopId
 
 interface StopDao : Dao<Stop> {
 
@@ -16,7 +17,7 @@ interface StopDao : Dao<Stop> {
      * @param id The id of the stop to retrieve.
      * @return The [Stop] with the corresponding [id]. null if it doesn't exist.
      */
-    fun getById(id: String): Stop?
+    fun getById(id: StopId): Stop?
 
     /**
      * Gets all stops with the given [code]. Since codes are not

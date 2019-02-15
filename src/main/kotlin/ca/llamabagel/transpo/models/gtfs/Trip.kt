@@ -7,9 +7,9 @@ package ca.llamabagel.transpo.models.gtfs
 /**
  * [https://developers.google.com/transit/gtfs/reference/#tripstxt]
  */
-data class Trip(val routeId: String,
-                val serviceId: String,
-                val tripId: String,
+data class Trip(val routeId: RouteId,
+                val serviceId: CalendarServiceId,
+                val tripId: TripId,
                 val headsign: String?,
                 val shortName: String?,
                 val directionId: Int?,
@@ -17,3 +17,6 @@ data class Trip(val routeId: String,
                 val shapeId: String?,
                 val wheelchairAccessible: Int?,
                 val bikesAllowed: Int?)
+
+inline class TripId(val value: String)
+fun String?.asTripId() = if (this == null) null else TripId(this)

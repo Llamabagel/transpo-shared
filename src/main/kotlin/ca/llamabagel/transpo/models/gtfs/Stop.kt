@@ -7,7 +7,7 @@ package ca.llamabagel.transpo.models.gtfs
 /**
  * [https://developers.google.com/app/gtfs/reference/#stopstxt]
  */
-data class Stop(val id: String,
+data class Stop(val id: StopId,
                 val code: String?,
                 val name: String,
                 val description: String?,
@@ -18,5 +18,7 @@ data class Stop(val id: String,
                 val locationType: Int?,
                 val parentStation: String?,
                 val timeZone: String?,
-                val wheelchairBoarding: Int?) {
-}
+                val wheelchairBoarding: Int?)
+
+inline class StopId(val value: String)
+fun String?.asStopId() = if (this == null) null else StopId(this)

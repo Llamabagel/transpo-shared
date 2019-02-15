@@ -21,10 +21,10 @@ import java.sql.Types
 class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
     override val stops = object : StopDao {
-        override fun getById(id: String): Stop? {
+        override fun getById(id: StopId): Stop? {
             val result = connection.prepareStatement("SELECT * FROM stops WHERE id = ?")
                     .apply {
-                        setString(1, id)
+                        setString(1, id.value)
                     }
                     .executeQuery()
 
@@ -63,7 +63,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.id)
+                    setString(1, i.id.value)
                     setString(2, i.code)
                     setString(3, i.name)
                     setString(4, i.description)
@@ -97,7 +97,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setString(9, i.parentStation)
                     setString(10, i.timeZone)
                     setObject(11, i.wheelchairBoarding, Types.INTEGER)
-                    setString(12, i.id)
+                    setString(12, i.id.value)
 
                     addBatch()
                 }
@@ -109,7 +109,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.id)
+                    setString(1, i.id.value)
                     statement.addBatch()
                 }
             }
@@ -128,7 +128,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             if (resultSet.wasNull()) wheelchairBoarding = null
 
             return Stop(
-                    id = resultSet.getString("id"),
+                    id = StopId(resultSet.getString("id")),
                     code = resultSet.getString("code"),
                     name = resultSet.getString("name"),
                     description = resultSet.getString("description"),
@@ -157,10 +157,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getById(id: String): Route? {
+        override fun getById(id: RouteId): Route? {
             val result = connection.prepareStatement("SELECT * FROM routes WHERE id = ?")
                     .apply {
-                        setString(1, id)
+                        setString(1, id.value)
                     }
                     .executeQuery()
 
@@ -182,8 +182,8 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.id)
-                    setString(2, i.agencyId)
+                    setString(1, i.id.value)
+                    setString(2, i.agencyId?.value)
                     setString(3, i.shortName)
                     setString(4, i.longName)
                     setString(5, i.description)
@@ -202,7 +202,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.agencyId)
+                    setString(1, i.agencyId?.value)
                     setString(2, i.shortName)
                     setString(3, i.longName)
                     setString(4, i.description)
@@ -211,7 +211,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setString(7, i.color)
                     setString(8, i.textColor)
                     setObject(9, i.sortOrder, Types.INTEGER)
-                    setString(10, i.id)
+                    setString(10, i.id.value)
                     addBatch()
                 }
             }
@@ -222,7 +222,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.id)
+                    setString(1, i.id.value)
                     statement.addBatch()
                 }
             }
@@ -233,8 +233,8 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             if (resultSet.wasNull()) sortOrder = null
 
             return Route(
-                    id = resultSet.getString("id"),
-                    agencyId = resultSet.getString("agencyId"),
+                    id = resultSet.getString("id").asRouteId()!!,
+                    agencyId = resultSet.getString("agencyId").asAgencyId(),
                     shortName = resultSet.getString("shortName"),
                     longName = resultSet.getString("longName"),
                     description = resultSet.getString("description"),
@@ -248,10 +248,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
     }
 
     override val agencies: AgencyDao = object : AgencyDao {
-        override fun getById(id: String): Agency? {
+        override fun getById(id: AgencyId): Agency? {
             val result = connection.prepareStatement("SELECT * FROM agencies WHERE id = ?")
                     .apply {
-                        setString(1, id)
+                        setString(1, id.value)
                     }
                     .executeQuery()
 
@@ -273,7 +273,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.id)
+                    setString(1, i.id.value)
                     setString(2, i.name)
                     setString(3, i.url)
                     setString(4, i.timeZone)
@@ -298,7 +298,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setString(5, i.phone)
                     setString(6, i.fareUrl)
                     setString(7, i.email)
-                    setString(8, i.id)
+                    setString(8, i.id.value)
                     addBatch()
                 }
             }
@@ -309,14 +309,14 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.id)
+                    setString(1, i.id.value)
                     statement.addBatch()
                 }
             }
         }
 
         private fun getAgencyFromResultSet(resultSet: ResultSet) = Agency(
-                id = resultSet.getString("id"),
+                id = resultSet.getString("id").asAgencyId()!!,
                 url = resultSet.getString("url"),
                 name = resultSet.getString("name"),
                 timeZone = resultSet.getString("timeZone"),
@@ -328,10 +328,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
     }
 
     override val calendars: CalendarDao = object : CalendarDao {
-        override fun getByServiceId(serviceId: String): Calendar? {
+        override fun getByServiceId(serviceId: CalendarServiceId): Calendar? {
             val result = connection.prepareStatement("SELECT * FROM calendars WHERE serviceId = ?")
                     .apply {
-                        setString(1, serviceId)
+                        setString(1, serviceId.value)
                     }
                     .executeQuery()
 
@@ -389,7 +389,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.serviceId)
+                    setString(1, i.serviceId.value)
                     setInt(2, i.monday)
                     setInt(3, i.tuesday)
                     setInt(4, i.wednesday)
@@ -406,7 +406,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun update(vararg t: Calendar): Boolean {
-            val statement = connection.prepareStatement("UPDATE calendars SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, friday = ?, saturday = ?, sunday = ?, startDate = ?, endDate = ? WHERE serviceId = ?")
+            val statement = connection.prepareStatement("UPDATE calendars SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, saturday = ?, sunday = ?, startDate = ?, endDate = ? WHERE serviceId = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -419,7 +419,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setInt(7, i.sunday)
                     setString(8, i.startDate)
                     setString(9, i.endDate)
-                    setString(10, i.serviceId)
+                    setString(10, i.serviceId.value)
 
                     addBatch()
                 }
@@ -431,14 +431,14 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.serviceId)
+                    setString(1, i.serviceId.value)
                     statement.addBatch()
                 }
             }
         }
 
         private fun getCalendarFromResultSet(resultSet: ResultSet) = Calendar(
-                serviceId = resultSet.getString("serviceId"),
+                serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
                 monday = resultSet.getInt("monday"),
                 tuesday = resultSet.getInt("tuesday"),
                 wednesday = resultSet.getInt("wednesday"),
@@ -452,10 +452,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
     }
 
     override val calendarDates: CalendarDateDao = object : CalendarDateDao {
-        override fun getByServiceId(serviceId: String): List<CalendarDate> {
+        override fun getByServiceId(serviceId: CalendarServiceId): List<CalendarDate> {
             val result = connection.prepareStatement("SELECT * FROM calendarDates WHERE serviceId = ?")
                     .apply {
-                        setString(1, serviceId)
+                        setString(1, serviceId.value)
                     }
                     .executeQuery()
 
@@ -490,7 +490,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.serviceId)
+                    setString(1, i.serviceId.value)
                     setString(2, i.date)
                     setInt(3, i.exceptionType)
 
@@ -505,7 +505,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             return statement.transact {
                 for (i in t) {
                     setInt(1, i.exceptionType)
-                    setString(2, i.serviceId)
+                    setString(2, i.serviceId.value)
                     setString(3, i.date)
 
                     addBatch()
@@ -518,24 +518,24 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.serviceId)
+                    setString(1, i.serviceId.value)
                     statement.addBatch()
                 }
             }
         }
 
         private fun getCalendarDateFromResultSet(resultSet: ResultSet) = CalendarDate(
-                serviceId = resultSet.getString("serviceId"),
+                serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
                 date = resultSet.getString("date"),
                 exceptionType = resultSet.getInt("exceptionType")
         )
     }
 
     override val stopTimes: StopTimeDao = object : StopTimeDao {
-        override fun getByTrip(trip: Trip): List<StopTime> {
+        override fun getByTripId(tripId: TripId): List<StopTime> {
             val result = connection.prepareStatement("SELECT * FROM stopTimes WHERE tripId = ?")
                     .apply {
-                        setString(1, trip.tripId)
+                        setString(1, tripId.value)
                     }
                     .executeQuery()
 
@@ -544,10 +544,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getByStop(stop: Stop): List<StopTime> {
+        override fun getByStopId(stopId: StopId): List<StopTime> {
             val result = connection.prepareStatement("SELECT * FROM stopTimes WHERE stopId = ?")
                     .apply {
-                        setString(1, stop.id)
+                        setString(1, stopId.value)
                     }
                     .executeQuery()
 
@@ -570,10 +570,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.tripId)
+                    setString(1, i.tripId.value)
                     setString(2, i.arrivalTime)
                     setString(3, i.departureTime)
-                    setString(4, i.stopId)
+                    setString(4, i.stopId.value)
                     setInt(5, i.stopSequence)
                     setString(6, i.stopHeadsign)
                     setObject(7, i.pickupType, Types.INTEGER)
@@ -599,8 +599,8 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setObject(6, i.dropOffType, Types.INTEGER)
                     setObject(7, i.shapeDistanceTraveled, Types.DOUBLE)
                     setObject(8, i.timepoint, Types.INTEGER)
-                    setString(9, i.tripId)
-                    setString(10, i.stopId)
+                    setString(9, i.tripId.value)
+                    setString(10, i.stopId.value)
 
                     addBatch()
                 }
@@ -612,18 +612,18 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.tripId)
-                    setString(2, i.stopId)
+                    setString(1, i.tripId.value)
+                    setString(2, i.stopId.value)
                     statement.addBatch()
                 }
             }
         }
 
         private fun getStopTimeFromResultSet(resultSet: ResultSet) = StopTime(
-                tripId = resultSet.getString("tripId"),
+                tripId = resultSet.getString("tripId").asTripId()!!,
                 arrivalTime = resultSet.getString("arrivalTime"),
                 departureTime = resultSet.getString("departureTime"),
-                stopId = resultSet.getString("stopId"),
+                stopId = resultSet.getString("stopId").asStopId()!!,
                 stopSequence = resultSet.getInt("stopSequence"),
                 stopHeadsign = resultSet.getString("stopHeadsign"),
                 pickupType = resultSet.getInt("pickupType"),
@@ -634,10 +634,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
     }
 
     override val trips: TripDao = object : TripDao {
-        override fun getByRoute(route: Route): List<Trip> {
+        override fun getByRouteId(routeId: RouteId): List<Trip> {
             val result = connection.prepareStatement("SELECT * FROM trips WHERE routeId = ?")
                     .apply {
-                        setString(1, route.id)
+                        setString(1, routeId.value)
                     }
                     .executeQuery()
 
@@ -646,10 +646,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getByRoute(route: Route, directionId: Int): List<Trip> {
+        override fun getByRouteId(routeId: RouteId, directionId: Int): List<Trip> {
             val result = connection.prepareStatement("SELECT * FROM trips WHERE routeId = ? AND directionId = ?")
                     .apply {
-                        setString(1, route.id)
+                        setString(1, routeId.value)
                         setInt(2, directionId)
                     }
                     .executeQuery()
@@ -659,10 +659,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getTripById(id: String): Trip? {
+        override fun getTripById(id: TripId): Trip? {
             val result = connection.prepareStatement("SELECT * FROM trips WHERE tripId = ?")
                     .apply {
-                        setString(1, id)
+                        setString(1, id.value)
                     }
                     .executeQuery()
 
@@ -671,10 +671,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getByServiceId(serviceId: String): List<Trip> {
+        override fun getByServiceId(serviceId: CalendarServiceId): List<Trip> {
             val result = connection.prepareStatement("SELECT * FROM trips WHERE serviceId = ?")
                     .apply {
-                        setString(1, serviceId)
+                        setString(1, serviceId.value)
                     }
                     .executeQuery()
 
@@ -697,9 +697,9 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.routeId)
-                    setString(2, i.serviceId)
-                    setString(3, i.tripId)
+                    setString(1, i.routeId.value)
+                    setString(2, i.serviceId.value)
+                    setString(3, i.tripId.value)
                     setString(4, i.headsign)
                     setString(5, i.shortName)
                     setObject(6, i.directionId, Types.INTEGER)
@@ -718,8 +718,8 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.routeId)
-                    setString(2, i.serviceId)
+                    setString(1, i.routeId.value)
+                    setString(2, i.serviceId.value)
                     setString(3, i.headsign)
                     setString(4, i.shortName)
                     setObject(5, i.directionId, Types.INTEGER)
@@ -727,7 +727,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setString(7, i.shapeId)
                     setObject(8, i.wheelchairAccessible, Types.INTEGER)
                     setObject(9, i.bikesAllowed, Types.INTEGER)
-                    setString(10, i.tripId)
+                    setString(10, i.tripId.value)
 
                     addBatch()
                 }
@@ -739,16 +739,16 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
             return statement.transact {
                 for (i in t) {
-                    setString(1, i.tripId)
+                    setString(1, i.tripId.value)
                     statement.addBatch()
                 }
             }
         }
 
         private fun getTripFromResultSet(resultSet: ResultSet) = Trip(
-                routeId = resultSet.getString("routeId"),
-                serviceId = resultSet.getString("serviceId"),
-                tripId = resultSet.getString("tripId"),
+                routeId = resultSet.getString("routeId").asRouteId()!!,
+                serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
+                tripId = resultSet.getString("tripId").asTripId()!!,
                 headsign = resultSet.getString("headsign"),
                 shortName = resultSet.getString("shortName"),
                 directionId = resultSet.getInt("directionId"),

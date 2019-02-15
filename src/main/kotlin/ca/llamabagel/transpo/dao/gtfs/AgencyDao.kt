@@ -6,6 +6,7 @@ package ca.llamabagel.transpo.dao.gtfs
 
 import ca.llamabagel.transpo.dao.Dao
 import ca.llamabagel.transpo.models.gtfs.Agency
+import ca.llamabagel.transpo.models.gtfs.AgencyId
 
 interface AgencyDao : Dao<Agency> {
 
@@ -15,6 +16,6 @@ interface AgencyDao : Dao<Agency> {
      * @param id The agency's id.
      * @return An [Agency] object, or null if the agency with the specified id does not exist.
      */
-    fun getById(id: String): Agency?
+    fun getById(id: AgencyId): Agency?
 
 }

@@ -6,6 +6,7 @@ package ca.llamabagel.transpo.dao.gtfs
 
 import ca.llamabagel.transpo.dao.Dao
 import ca.llamabagel.transpo.models.gtfs.Route
+import ca.llamabagel.transpo.models.gtfs.RouteId
 
 interface RouteDao : Dao<Route> {
 
@@ -23,6 +24,6 @@ interface RouteDao : Dao<Route> {
      * @param id The id of the Route
      * @return The [Route] with the corresponding id. null if it doesn't exist.
      */
-    fun getById(id: String): Route?
+    fun getById(id: RouteId): Route?
 
 }

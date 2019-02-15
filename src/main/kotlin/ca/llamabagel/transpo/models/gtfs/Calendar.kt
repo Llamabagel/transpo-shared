@@ -7,7 +7,7 @@ package ca.llamabagel.transpo.models.gtfs
 /**
  * [https://developers.google.com/app/gtfs/reference/#calendartxt]
  */
-data class Calendar(val serviceId: String,
+data class Calendar(val serviceId: CalendarServiceId,
                     val monday: Int,
                     val tuesday: Int,
                     val wednesday: Int,
@@ -17,3 +17,6 @@ data class Calendar(val serviceId: String,
                     val sunday: Int,
                     val startDate: String,
                     val endDate: String)
+
+inline class CalendarServiceId(val value: String)
+fun String?.asCalendarServiceId() = if (this == null) null else CalendarServiceId(this)

@@ -5,8 +5,7 @@
 package ca.llamabagel.transpo.dao.impl
 
 import ca.llamabagel.transpo.dao.gtfs.*
-import ca.llamabagel.transpo.models.gtfs.Route
-import ca.llamabagel.transpo.models.gtfs.Stop
+import ca.llamabagel.transpo.models.gtfs.*
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -30,15 +29,15 @@ class GtfsDirectory(val path: String) : GtfsSource() {
          * @return The [Stop] object created from the line.
          */
         private fun makeStopFromCsv(parts: List<String>) =
-                Stop(parts[0], parts[1], parts[2], parts[3], parts[4].toDouble(), parts[5].toDouble(),
+                Stop(parts[0].asStopId()!!, parts[1], parts[2], parts[3], parts[4].toDouble(), parts[5].toDouble(),
                         parts[6].toIntOrNull(), parts[7], parts[8].toIntOrNull(), null, null, null)
 
-        override fun getById(id: String): Stop? {
+        override fun getById(id: StopId): Stop? {
             var stop: Stop? = null
             Files.lines(Paths.get("$path/stops.txt")).use { stream ->
                 stream.forEach {
                     val parts = it.split(",")
-                    if (parts[0] == id) {
+                    if (parts[0] == id.value) {
                         stop = makeStopFromCsv(parts)
                     }
                 }
@@ -102,7 +101,7 @@ class GtfsDirectory(val path: String) : GtfsSource() {
          * @return The [Route] object created from the line.
          */
         private fun makeRouteFromCsv(parts: List<String>) =
-                Route(parts[0], null, parts[1], parts[2], parts[3], parts[4].toInt(),
+                Route(parts[0].asRouteId()!!, null, parts[1], parts[2], parts[3], parts[4].toInt(),
                         parts[6], null, null, null)
 
 
@@ -120,12 +119,12 @@ class GtfsDirectory(val path: String) : GtfsSource() {
             return route
         }
 
-        override fun getById(id: String): Route? {
+        override fun getById(id: RouteId): Route? {
             var route: Route? = null
             Files.lines(Paths.get("$path/routes.txt")).use { stream ->
                 stream.forEach {
                     val parts = it.split(",")
-                    if (parts[0] == id) {
+                    if (parts[0] == id.value) {
                         route = makeRouteFromCsv(parts)
                     }
                 }

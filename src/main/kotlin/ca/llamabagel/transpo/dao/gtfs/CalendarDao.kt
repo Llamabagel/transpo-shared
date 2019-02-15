@@ -6,6 +6,7 @@ package ca.llamabagel.transpo.dao.gtfs
 
 import ca.llamabagel.transpo.dao.Dao
 import ca.llamabagel.transpo.models.gtfs.Calendar
+import ca.llamabagel.transpo.models.gtfs.CalendarServiceId
 
 interface CalendarDao : Dao<Calendar> {
 
@@ -16,7 +17,7 @@ interface CalendarDao : Dao<Calendar> {
      * @param serviceId The service id of the calendar
      * @return The corresponding [Calendar], or null if it doesn't exist
      */
-    fun getByServiceId(serviceId: String): Calendar?
+    fun getByServiceId(serviceId: CalendarServiceId): Calendar?
 
     /**
      * Gets all [Calendar]s that match the provided values as weekday values.

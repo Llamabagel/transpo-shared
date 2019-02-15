@@ -6,6 +6,7 @@ package ca.llamabagel.transpo.dao.gtfs
 
 import ca.llamabagel.transpo.dao.Dao
 import ca.llamabagel.transpo.models.gtfs.CalendarDate
+import ca.llamabagel.transpo.models.gtfs.CalendarServiceId
 
 interface CalendarDateDao : Dao<CalendarDate> {
 
@@ -15,7 +16,7 @@ interface CalendarDateDao : Dao<CalendarDate> {
      * @param serviceId The service id to search for
      * @return List of all [CalendarDate]s with that service id
      */
-    fun getByServiceId(serviceId: String): List<CalendarDate>
+    fun getByServiceId(serviceId: CalendarServiceId): List<CalendarDate>
 
     /**
      * Gets all [CalendarDate] items for a specified date.
