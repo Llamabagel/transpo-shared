@@ -16,7 +16,6 @@ class GtfsDatabaseTest {
     @get:Rule
     val postgres = EmbeddedPostgresRules.preparedDatabase(FlywayPreparer.forClasspathLocation("db/testing"))!!
 
-
      // GtfsDatabase.stops tests.
     @Test
     fun testStopGetById() {
@@ -24,8 +23,8 @@ class GtfsDatabaseTest {
 
         val stop = source.stops.getById(StopId("AF970"))
         assertTrue(stop != null)
-        assertTrue(stop?.id == StopId("AF970"))
-        assertTrue(stop?.code == "3030")
+        assertEquals(StopId("AF970").value, stop?.id)
+        assertEquals("3030", stop?.code)
 
         assertNull(source.stops.getById(StopId("SomeNonIdValue")))
     }
@@ -218,6 +217,8 @@ class GtfsDatabaseTest {
 
         val none = source.calendars.getByDays(monday = 1, sunday = 1)
         assertTrue(none.isEmpty())
+
+        assertTrue(source.calendars.getByDays().isEmpty())
     }
 
     @Test
@@ -323,40 +324,137 @@ class GtfsDatabaseTest {
     }
 
     // StopTime tests
-    /*@Test
-    fun testStopTimeGetByTrip() {
+    @Test
+    fun testStopTimeGetByTripId() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-
+        val stopTimes = source.stopTimes.getByTripId("56994291-JAN19-301Shop-Weekday-01".asTripId()!!)
+        assertTrue(stopTimes.size == 5)
+        assertNotNull(stopTimes.find { stopTime -> stopTime.stopId.value == "WR285" })
     }
 
     @Test
-    fun testStopTimeGetByStop() {
+    fun testStopTimeGetByStopId() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
+        val stopTimes = source.stopTimes.getByStopId("CK110".asStopId()!!)
+        assertTrue(stopTimes.size == 2)
+        assertNotNull(stopTimes.find { stopTime -> stopTime.tripId.value == "59528499-JAN19-Reduced-Weekday-02" })
     }
 
     @Test
     fun testStopTimeGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
+        val stopTimes = source.stopTimes.getAll()
+        assertTrue(stopTimes.size == 9)
     }
 
     @Test
     fun testStopTimeInsert() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
+        val stopTime = StopTime(TripId("ATrip"), "1:00", "1:00", StopId("AA100"), 1, null, null, null, null, null)
+        assertTrue(source.stopTimes.insert(stopTime))
+        assertTrue(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
+        assertEquals(stopTime, source.stopTimes.getByTripId(stopTime.tripId)[0])
     }
 
     @Test
     fun testStopTimeUpdate() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
+        val stopTime = StopTime(TripId("ATrip"), "1:00", "1:00", StopId("AA100"), 1, null, null, null, null, null)
+        source.stopTimes.insert(stopTime)
+
+        val newStopTime = StopTime(TripId("ATrip"), "1:01", "1:01", StopId("AA100"), 1, "No", 1, 2, 0.1, 1)
+        assertTrue(source.stopTimes.update(newStopTime))
+        assertFalse(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
+        assertTrue(source.stopTimes.getByTripId(stopTime.tripId).contains(newStopTime))
     }
 
     @Test
     fun testStopTimeDelete() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-    }*/
+        val stopTime = StopTime(TripId("ATrip"), "1:00", "1:00", StopId("AA100"), 1, null, null, null, null, null)
+        source.stopTimes.insert(stopTime)
+
+        assertTrue(source.stopTimes.delete(stopTime))
+        assertFalse(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
+    }
+
+    // Trips tests
+    @Test
+    fun testTripGetByRouteId() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val trips = source.trips.getByRouteId("91-288".asRouteId()!!)
+        assertTrue(trips.size == 2)
+        assertNotNull(trips.find { trip -> trip.tripId.value == "57328740-JAN19-JANDA19-Weekday-26" })
+        assertNotNull(trips.find { trip -> trip.tripId.value == "57328743-JAN19-JANDA19-Weekday-26" })
+
+        val directionTrips = source.trips.getByRouteId("91-288".asRouteId()!!, 1)
+        assertTrue(directionTrips.size == 1)
+        assertNotNull(directionTrips.find { trip -> trip.tripId.value == "57328740-JAN19-JANDA19-Weekday-26" })
+        assertNull(directionTrips.find { trip -> trip.tripId.value == "57328743-JAN19-JANDA19-Weekday-26" })
+    }
+
+    @Test
+    fun testTripGetByTripId() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val trip = source.trips.getByTripId("57328738-JAN19-JANDA19-Weekday-26".asTripId()!!)
+        assertNotNull(trip)
+        assertTrue(trip?.tripId?.value == "57328738-JAN19-JANDA19-Weekday-26")
+    }
+
+    @Test
+    fun testTripGetByServiceId() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val trips = source.trips.getByServiceId("JAN19-JANDA19-Weekday-26".asCalendarServiceId()!!)
+        assertEquals(4, trips.size)
+    }
+
+    @Test
+    fun testTripGetAll() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val trips = source.trips.getAll()
+        assertEquals(4, trips.size)
+    }
+
+    @Test
+    fun testTripInsert() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val trip = Trip(RouteId("1-1"), CalendarServiceId("TestService"), TripId("Trip1"), "Forward", null, 0, null, null, null, null)
+        assertTrue(source.trips.insert(trip))
+        assertEquals(source.trips.getByTripId(trip.tripId), trip)
+    }
+
+    @Test
+    fun testTripUpdate() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val trip = Trip(RouteId("1-1"), CalendarServiceId("TestService"), TripId("Trip1"), "Forward", null, 0, null, null, null, null)
+        source.trips.insert(trip)
+
+        val newTrip = Trip(trip.routeId, trip.serviceId, trip.tripId, "Backward", "No", 1, "1", "None", 1, 1)
+        assertTrue(source.trips.update(newTrip))
+        assertNotEquals(trip, source.trips.getByTripId(trip.tripId))
+        assertEquals(newTrip, source.trips.getByTripId(trip.tripId))
+    }
+
+    @Test
+    fun testTripDelete() {
+        val source = GtfsDatabase(postgres.testDatabase.connection)
+
+        val trip = Trip(RouteId("1-1"), CalendarServiceId("TestService"), TripId("Trip1"), "Forward", null, 0, null, null, null, null)
+        source.trips.insert(trip)
+
+        assertTrue(source.trips.delete(trip))
+        assertNull(source.trips.getByTripId(trip.tripId))
+    }
 }

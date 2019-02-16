@@ -33,7 +33,7 @@ interface TripDao : Dao<Trip> {
      * @param id The trip's id.
      * @return The [Trip] object, null if it does not exist.
      */
-    fun getTripById(id: TripId): Trip?
+    fun getByTripId(id: TripId): Trip?
 
     /**
      * Gets a list of trips for a specified service id.

@@ -619,18 +619,32 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        private fun getStopTimeFromResultSet(resultSet: ResultSet) = StopTime(
-                tripId = resultSet.getString("tripId").asTripId()!!,
-                arrivalTime = resultSet.getString("arrivalTime"),
-                departureTime = resultSet.getString("departureTime"),
-                stopId = resultSet.getString("stopId").asStopId()!!,
-                stopSequence = resultSet.getInt("stopSequence"),
-                stopHeadsign = resultSet.getString("stopHeadsign"),
-                pickupType = resultSet.getInt("pickupType"),
-                dropOffType = resultSet.getInt("dropOffType"),
-                shapeDistanceTraveled = resultSet.getDouble("shapeDistanceTraveled"),
-                timepoint = resultSet.getInt("timepoint")
-        )
+        private fun getStopTimeFromResultSet(resultSet: ResultSet): StopTime {
+            var pickupType: Int? = resultSet.getInt("pickupType")
+            if (resultSet.wasNull()) pickupType = null
+
+            var dropOffType: Int? = resultSet.getInt("dropOffType")
+            if (resultSet.wasNull()) dropOffType = null
+
+            var shapeDistanceTraveled: Double? = resultSet.getDouble("shapeDistanceTraveled")
+            if (resultSet.wasNull()) shapeDistanceTraveled = null
+
+            var timepoint: Int? = resultSet.getInt("timepoint")
+            if (resultSet.wasNull()) timepoint = null
+
+            return StopTime(
+                    tripId = resultSet.getString("tripId").asTripId()!!,
+                    arrivalTime = resultSet.getString("arrivalTime"),
+                    departureTime = resultSet.getString("departureTime"),
+                    stopId = resultSet.getString("stopId").asStopId()!!,
+                    stopSequence = resultSet.getInt("stopSequence"),
+                    stopHeadsign = resultSet.getString("stopHeadsign"),
+                    pickupType = pickupType,
+                    dropOffType = dropOffType,
+                    shapeDistanceTraveled = shapeDistanceTraveled,
+                    timepoint = timepoint
+            )
+        }
     }
 
     override val trips: TripDao = object : TripDao {
@@ -659,7 +673,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getTripById(id: TripId): Trip? {
+        override fun getByTripId(id: TripId): Trip? {
             val result = connection.prepareStatement("SELECT * FROM trips WHERE tripId = ?")
                     .apply {
                         setString(1, id.value)
@@ -745,18 +759,29 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        private fun getTripFromResultSet(resultSet: ResultSet) = Trip(
-                routeId = resultSet.getString("routeId").asRouteId()!!,
-                serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
-                tripId = resultSet.getString("tripId").asTripId()!!,
-                headsign = resultSet.getString("headsign"),
-                shortName = resultSet.getString("shortName"),
-                directionId = resultSet.getInt("directionId"),
-                blockId = resultSet.getString("blockId"),
-                shapeId = resultSet.getString("shapeId"),
-                wheelchairAccessible = resultSet.getInt("wheelchairAccessible"),
-                bikesAllowed = resultSet.getInt("bikesAllowed")
-        )
+        private fun getTripFromResultSet(resultSet: ResultSet): Trip {
+            var directionId: Int? = resultSet.getInt("directionId")
+            if (resultSet.wasNull()) directionId = null
+
+            var wheelchairAccessible: Int? = resultSet.getInt("wheelchairAccessible")
+            if (resultSet.wasNull()) wheelchairAccessible = null
+
+            var bikesAllowed: Int? = resultSet.getInt("bikesAllowed")
+            if (resultSet.wasNull()) bikesAllowed = null
+
+            return Trip(
+                    routeId = resultSet.getString("routeId").asRouteId()!!,
+                    serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
+                    tripId = resultSet.getString("tripId").asTripId()!!,
+                    headsign = resultSet.getString("headsign"),
+                    shortName = resultSet.getString("shortName"),
+                    directionId = directionId,
+                    blockId = resultSet.getString("blockId"),
+                    shapeId = resultSet.getString("shapeId"),
+                    wheelchairAccessible = wheelchairAccessible,
+                    bikesAllowed = bikesAllowed
+            )
+        }
     }
 
     /**
