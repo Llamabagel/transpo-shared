@@ -1,0 +1,6 @@
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type
+NF210,7467,"ADMIRAL / ANNA",,45.382643,-75.72909,,,0
+NF220,7465,"ADMIRAL / ANNA",,45.382817,-75.729458,,,0
+AF970,3030,"LYCÉE CLAUDEL 2A",,45.406614,-75.664225,,,0
+AF975,3031,"SMYTH 1A",,45.40118,-75.666742,,,0
+AF980,3031,"SMYTH 2A",,45.401167,-75.666591,,,0
