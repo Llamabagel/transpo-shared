@@ -86,4 +86,14 @@ class GtfsDirectoryTest {
         assertFalse(source.stops.update(notAStop))
     }
 
+    @Test
+    fun testStopDelete() {
+        val source = GtfsDirectory(testFolder.root.toPath())
+
+        val stop = Stop(StopId("BB200"), "1234", "INSERT / TEST", null, -46.0, 76.0, null, null, null, null, null, null)
+        source.stops.insert(stop)
+        assertTrue(source.stops.delete(stop))
+        assertNull(source.stops.getById(stop.id))
+    }
+
 }

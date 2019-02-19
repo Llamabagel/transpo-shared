@@ -16,4 +16,4 @@ data class StopTime(val tripId: TripId,
                     val pickupType: Int?,
                     val dropOffType: Int?,
                     val shapeDistanceTraveled: Double?,
-                    val timepoint: Int?)
+                    val timepoint: Int?) : GtfsObject()

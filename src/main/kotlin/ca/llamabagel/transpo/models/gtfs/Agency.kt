@@ -14,8 +14,7 @@ data class Agency(val id: AgencyId,
                   val language: String?,
                   val phone: String?,
                   val fareUrl: String?,
-                  val email: String?) {
-}
+                  val email: String?) : GtfsObject()
 
 inline class AgencyId(val value: String)
 fun String?.asAgencyId() = if (this == null) null else AgencyId(this)

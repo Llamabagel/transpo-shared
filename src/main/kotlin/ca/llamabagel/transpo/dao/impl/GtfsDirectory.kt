@@ -6,13 +6,10 @@ package ca.llamabagel.transpo.dao.impl
 
 import ca.llamabagel.transpo.dao.gtfs.*
 import ca.llamabagel.transpo.models.gtfs.*
-import java.lang.NumberFormatException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
-import java.util.stream.Collectors
-import kotlin.streams.toList
 
 /**
  * A data source for GTFS data based out of a file directory containing the GTFS files.
@@ -30,87 +27,33 @@ class GtfsDirectory(val path: Path) : GtfsSource() {
     override val stops = object : StopDao {
 
         override fun getById(id: StopId): Stop? {
-            return Files.lines(path.resolve("stops.txt")).use { stream ->
-                var stop: Stop? = null
-
-                stream.skip(1).forEach {
-                    val csv = CsvStop(it.split(","))
-                    if (csv.id == id) {
-                        stop = csv.toStop()
-                    }
-                }
-
-                return@use stop
-            }
+            return getItemByKey(path.resolve("stops.txt"), ::CsvStop, stopKey, id)
         }
 
         override fun getByCode(code: String): List<Stop> {
-            val stops = ArrayList<Stop>()
-            Files.lines(path.resolve("stops.txt")).use { stream ->
-                stream.skip(1).forEach {
-                    val csv = CsvStop(it.split(","))
-                    if (csv.code == code) {
-                        stops.add(csv.toStop())
-                    }
+            return getItemsByKey(path.resolve("stops.txt"), ::CsvStop, {
+                when (it) {
+                    is CsvStop -> it.code
+                    is Stop -> it.code
+                    else -> throw IllegalArgumentException("$it was not a Stop or CsvStop object")
                 }
-            }
-
-            return stops
+            }, code)
         }
 
         override fun getAll(): List<Stop> {
-            val stops = ArrayList<Stop>()
-            Files.lines(path.resolve("stops.txt")).use { stream ->
-                stream.skip(1).forEach {
-                    stops.add(CsvStop(it.split(",")).toStop())
-                }
-            }
-
-            return stops
+            return getAllItems(path.resolve("stops.txt"), ::CsvStop)
         }
 
         override fun insert(vararg t: Stop): Boolean {
-            var values = "\n"
-
-            t.forEach {
-                if (getById(it.id) != null) {
-                    return false
-                } else {
-                    values += "${CsvStop(it).toCsvRow()}\n"
-                }
-            }
-
-            Files.write(path.resolve("stops.txt"), values.toByteArray(), StandardOpenOption.APPEND)
-
-            return true
+            return insertCsvRows(path.resolve("stops.txt"), this::getById, stopKey, ::CsvStop, *t)
         }
 
         override fun update(vararg t: Stop): Boolean {
-            val stops = t.associateBy({it.id},{it}).toMutableMap()
-
-            val updatedLines = Files.lines(path.resolve("stops.txt")).use { stream ->
-                stream.map {
-                    val csv = CsvStop(it)
-
-                    if (stops.containsKey(csv.id)) {
-                        val out = CsvStop(stops.getValue(csv.id)).toCsvRow()
-                        stops.remove(csv.id)
-                        return@map out
-                    }
-                    return@map it
-                }.toList()
-            }
-
-            if (stops.isEmpty()) {
-                Files.write(path.resolve("stops.txt"), updatedLines);
-                return true
-            }
-
-            return false
+            return updateCsvRows(path.resolve("stops.txt"), ::CsvStop, ::CsvStop, stopKey, *t)
         }
 
         override fun delete(vararg t: Stop): Boolean {
-            TODO("not implemented")
+            return deleteCsvRows(path.resolve("stops.txt"), ::CsvStop, stopKey, *t)
         }
 
     }
@@ -321,24 +264,43 @@ class GtfsDirectory(val path: Path) : GtfsSource() {
 
 }
 
-private inline class CsvStop(val parts: List<String?>) {
+/*
+private interface CsvObject<T> {
+    fun toObject(): T
+
+    fun toCsvRow(): String
+
+    companion object {
+        @JvmStatic
+        fun partsToCsv(parts: List<String?>): String = parts.joinToString(separator = ",") { it ?: "" }
+    }
+}
+
+private inline class CsvStop(val parts: List<String?>) : CsvObject<Stop> {
+
     constructor(string: String) : this(string.split(","))
 
     constructor(stop: Stop)
-            : this(listOf(stop.id.value, stop.code, stop.name, stop.description, stop.latitude.toString(), stop.longitude.toString(), stop.zoneId?.toString(), stop.stopUrl, stop.locationType?.toString()))
+            : this(listOf(stop.id.value, stop.code, stop.name, stop.description, stop.latitude.toString(),
+            stop.longitude.toString(), stop.zoneId?.toString(), stop.stopUrl, stop.locationType?.toString(),
+            stop.parentStation, stop.timeZone, stop.wheelchairBoarding?.toString()))
 
+    // Property accessors for a stop object. Gets the corresponding "part" from the csv.
     inline val id: StopId get() = parts[0].asStopId()!!
     inline val code: String? get() = if (parts[1] == "") null else parts[1]
     inline val name: String get() = parts[2]!!
     inline val description: String? get() = if (parts[3] == "") null else parts[3]
-    inline val latitude: Double get() = try { parts[4]!!.toDouble() } catch (e: NumberFormatException) { Double.NaN }
-    inline val longitude: Double get() = try { parts[5]!!.toDouble() } catch (e: NumberFormatException) { Double.NaN }
+    inline val latitude: Double get() = parts[4]?.toDoubleOrNull() ?: Double.NaN
+    inline val longitude: Double get() = parts[5]?.toDoubleOrNull() ?: Double.NaN
     inline val zoneId: Int? get() = parts[6]?.toIntOrNull()
     inline val stopUrl: String? get() = if (parts[7] == "") null else parts[7]
     inline val locationType: Int? get() = parts[8]?.toIntOrNull()
+    inline val parentStation: String? get() = parts[9]
+    inline val timeZone: String? get() = parts[10]
+    inline val wheelchairBoarding: Int? get() = parts[11]?.toIntOrNull()
 
-    fun toStop() = Stop(id, code, name, description, latitude, longitude,
-            zoneId, stopUrl, locationType, null, null, null)
+    override fun toObject() = Stop(id, code, name, description, latitude, longitude,
+            zoneId, stopUrl, locationType, parentStation, timeZone, wheelchairBoarding)
 
-    fun toCsvRow() = "${id.value},${code ?: ""},$name,${description ?: ""},$latitude,$longitude,$zoneId,${stopUrl ?: ""},$locationType"
-}
+    override fun toCsvRow(): String = CsvObject.partsToCsv(parts)
+}*/

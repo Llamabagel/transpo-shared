@@ -16,7 +16,7 @@ data class Route(val id: RouteId,
                  val url: String?,
                  val color: String?,
                  val textColor: String?,
-                 val sortOrder: Int?)
+                 val sortOrder: Int?) : GtfsObject()
 
 inline class RouteId(val value: String)
 fun String?.asRouteId() = if (this == null) null else RouteId(this)

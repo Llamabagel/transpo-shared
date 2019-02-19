@@ -16,7 +16,7 @@ data class Trip(val routeId: RouteId,
                 val blockId: String?,
                 val shapeId: String?,
                 val wheelchairAccessible: Int?,
-                val bikesAllowed: Int?)
+                val bikesAllowed: Int?) : GtfsObject()
 
 inline class TripId(val value: String)
 fun String?.asTripId() = if (this == null) null else TripId(this)
