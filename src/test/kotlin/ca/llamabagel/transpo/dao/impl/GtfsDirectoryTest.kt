@@ -6,8 +6,10 @@ package ca.llamabagel.transpo.dao.impl
 
 import ca.llamabagel.transpo.models.gtfs.Stop
 import ca.llamabagel.transpo.models.gtfs.StopId
+import junit.framework.Assert.*
 import org.apache.commons.io.FileUtils
 import org.junit.*
+import org.junit.Assert.assertNotEquals
 import org.junit.rules.TemporaryFolder
 import java.nio.file.Files
 import java.nio.file.Path
@@ -42,8 +44,8 @@ class GtfsDirectoryTest {
         val source = GtfsDirectory(testFolder.root.toPath())
 
         val result = source.stops.getByCode("3031")
-        Assert.assertEquals(2, result.size)
-        Assert.assertNotNull(result.find { stop -> stop.id == StopId("AF980") })
+        assertEquals(2, result.size)
+        assertNotNull(result.find { stop -> stop.id == StopId("AF980") })
     }
 
     @Test
@@ -51,17 +53,37 @@ class GtfsDirectoryTest {
         val source = GtfsDirectory(testFolder.root.toPath())
 
         val result = source.stops.getAll()
-        Assert.assertEquals(5, result.size)
-        Assert.assertNotNull(result.find { stop -> stop.id == StopId("AF980") })
+        assertEquals(5, result.size)
+        assertNotNull(result.find { stop -> stop.id == StopId("AF980") })
     }
 
-    /*@Test
+    @Test
     fun testStopInsert() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
         val stop = Stop(StopId("BB200"), "1234", "INSERT / TEST", null, -46.0, 76.0, null, null, null, null, null, null)
-        Assert.assertTrue(source.stops.insert(stop))
-        Assert.assertEquals(stop, source.stops.getById(stop.id))
-    }*/
+        assertTrue(source.stops.insert(stop))
+        assertEquals(stop, source.stops.getById(stop.id))
+
+        val existing = Stop(StopId("AF980"), null, "", null, -46.0, 76.0, null, null, null, null, null, null)
+        assertFalse(source.stops.insert(existing))
+    }
+
+    @Test
+    fun testStopUpdate() {
+        val source = GtfsDirectory(testFolder.root.toPath())
+
+        val stop = Stop(StopId("BB200"), "1234", "INSERT / TEST", null, -46.0, 76.0, null, null, null, null, null, null)
+        source.stops.insert(stop)
+
+        // Update each value except the id. parentStation, timeZone, and wheelchairBoarding are not supported for CSV updates.
+        val newStop = Stop(StopId("BB200"), "1235", "UPDATE / TEST", "A description", -47.0, 78.0, 0, "url", 7, null, null, null)
+        assertTrue(source.stops.update(newStop))
+        assertNotEquals(stop, source.stops.getById(newStop.id))
+        assertEquals(newStop, source.stops.getById(newStop.id))
+
+        val notAStop = Stop(StopId("NOO"), null, "", null, -47.0, 48.0, null, null, null, null, null, null)
+        assertFalse(source.stops.update(notAStop))
+    }
 
 }

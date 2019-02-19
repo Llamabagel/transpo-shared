@@ -11,6 +11,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
+import java.util.stream.Collectors
+import kotlin.streams.toList
 
 /**
  * A data source for GTFS data based out of a file directory containing the GTFS files.
@@ -84,7 +86,27 @@ class GtfsDirectory(val path: Path) : GtfsSource() {
         }
 
         override fun update(vararg t: Stop): Boolean {
-            TODO("not implemented")
+            val stops = t.associateBy({it.id},{it}).toMutableMap()
+
+            val updatedLines = Files.lines(path.resolve("stops.txt")).use { stream ->
+                stream.map {
+                    val csv = CsvStop(it)
+
+                    if (stops.containsKey(csv.id)) {
+                        val out = CsvStop(stops.getValue(csv.id)).toCsvRow()
+                        stops.remove(csv.id)
+                        return@map out
+                    }
+                    return@map it
+                }.toList()
+            }
+
+            if (stops.isEmpty()) {
+                Files.write(path.resolve("stops.txt"), updatedLines);
+                return true
+            }
+
+            return false
         }
 
         override fun delete(vararg t: Stop): Boolean {
@@ -300,21 +322,23 @@ class GtfsDirectory(val path: Path) : GtfsSource() {
 }
 
 private inline class CsvStop(val parts: List<String?>) {
+    constructor(string: String) : this(string.split(","))
+
     constructor(stop: Stop)
             : this(listOf(stop.id.value, stop.code, stop.name, stop.description, stop.latitude.toString(), stop.longitude.toString(), stop.zoneId?.toString(), stop.stopUrl, stop.locationType?.toString()))
 
     inline val id: StopId get() = parts[0].asStopId()!!
-    inline val code: String? get() = parts[1]
+    inline val code: String? get() = if (parts[1] == "") null else parts[1]
     inline val name: String get() = parts[2]!!
-    inline val description: String? get() = parts[3]
+    inline val description: String? get() = if (parts[3] == "") null else parts[3]
     inline val latitude: Double get() = try { parts[4]!!.toDouble() } catch (e: NumberFormatException) { Double.NaN }
     inline val longitude: Double get() = try { parts[5]!!.toDouble() } catch (e: NumberFormatException) { Double.NaN }
     inline val zoneId: Int? get() = parts[6]?.toIntOrNull()
-    inline val stopUrl: String? get() = parts[7]
+    inline val stopUrl: String? get() = if (parts[7] == "") null else parts[7]
     inline val locationType: Int? get() = parts[8]?.toIntOrNull()
 
     fun toStop() = Stop(id, code, name, description, latitude, longitude,
             zoneId, stopUrl, locationType, null, null, null)
 
-    fun toCsvRow() = "${id.value},$code,$name,${description ?: "null"},$latitude,$longitude,$zoneId,${stopUrl ?: "null"},$locationType"
+    fun toCsvRow() = "${id.value},${code ?: ""},$name,${description ?: ""},$latitude,$longitude,$zoneId,${stopUrl ?: ""},$locationType"
 }
