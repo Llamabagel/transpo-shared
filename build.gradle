@@ -4,7 +4,9 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
 }
 
-group 'ca.llamabagel.transpo.shared'
+apply plugin: 'maven'
+
+group 'ca.llamabagel.transpo'
 version 'git describe --tag --dirty'.execute().text.trim()
 
 repositories {
@@ -39,6 +41,7 @@ compileKotlin {
         freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
     }
 }
+
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }

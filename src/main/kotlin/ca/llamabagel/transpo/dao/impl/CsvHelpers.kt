@@ -23,6 +23,20 @@ val stopKey: KeyFunction<StopId> = {
     }
 }
 
+/**
+ * Inserts the given list of items as rows in a csv file.
+ *
+ * @param path Full path to the csv file
+ * @param objectInitializer Function reference to the [CsvObject] inline class constructor that constructs the CsvObject instance from a [GtfsObject]
+ * @param key Function that returns the unique key or id of an object of type [T]. This function should accept parameters of both type [T] and [C].
+ * @param items The list of items to be inserted
+ *
+ * @param T The type of GtfsObject being inserted
+ * @param C The type of the inline class used to wrap a List<String?> as a [T]
+ * @param R The type of of the key or id of each [T]
+ *
+ * @return True if all items were inserted successfully, false otherwise.
+ */
 inline fun <T : GtfsObject, C : CsvObject<T>, R> insertCsvRows(path: Path, duplicateChecker: (R) -> T?, crossinline key: KeyFunction<R>, crossinline objectInitializer: (T) -> C, vararg items: T): Boolean {
     val values = "\n" +
             items.map {
@@ -47,9 +61,11 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> insertCsvRows(path: Path, dupli
  * @param T The type of GtfsObject being updated
  * @param C The type of the inline class used to wrap a List<String?> as a [T]
  * @param R The type of of the key or id of each [T]
+ *
+ * @return True if all items were updated successfully, false otherwise.
  */
 inline fun <T : GtfsObject, C : CsvObject<T>, R> updateCsvRows(path: Path, crossinline stringInitializer: (String) -> C, crossinline objectInitializer: (T) -> C,
-                                                                  crossinline key: KeyFunction<R>, vararg objects: T): Boolean {
+                                                               crossinline key: KeyFunction<R>, vararg objects: T): Boolean {
     val mapped = objects.associateBy(key, { it }).toMutableMap()
 
     val updatedLines = Files.lines(path).use { stream ->
@@ -82,9 +98,11 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> updateCsvRows(path: Path, cross
  * @param T The type of GtfsObject being deleted
  * @param C The type of the inline class used to wrap a List<String?> as a [T]
  * @param R The type of of the key or id of each [T]
+ *
+ * @return True if all items were deleted successfully, false otherwise.
  */
 inline fun <T : GtfsObject, C : CsvObject<T>, R> deleteCsvRows(path: Path, crossinline stringInitializer: (String) -> C, crossinline key: KeyFunction<R>,
-                                                                  vararg objects: T): Boolean {
+                                                               vararg objects: T): Boolean {
     val mapped = objects.associateBy(key, { it }).toMutableMap()
 
     val updatedLines = Files.lines(path).use { stream ->
@@ -105,7 +123,20 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> deleteCsvRows(path: Path, cross
 
     return false
 }
-
+/**
+ * Gets an item from a csv file by a specified key. This function will return the first item that matches the given key.
+ *
+ * @param path Full path to the csv file
+ * @param stringInitializer Function reference to the [CsvObject] inline class constructor that constructs the CsvObject instance from a string.
+ * @param keyFunction Function that returns the unique key or id of an object of type [T]. This function should accept parameters of both type [T] and [C].
+ * @param key The key of the item to find
+ *
+ * @param T The type of GtfsObject being deleted
+ * @param C The type of the inline class used to wrap a List<String?> as a [T]
+ * @param R The type of of the key or id of each [T]
+ *
+ * @return The first item found or null if the item doesn't exist.
+ */
 inline fun <T : GtfsObject, C : CsvObject<T>, R> getItemByKey(path: Path, crossinline stringInitializer: (String) -> C, crossinline keyFunction: KeyFunction<R>, key: R): T? {
     return Files.lines(path).use { stream ->
         var item: T? = null
@@ -122,6 +153,20 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> getItemByKey(path: Path, crossi
     }
 }
 
+/**
+ * Gets all the items from a csv file that match a specified key.
+ *
+ * @param path Full path to the csv file
+ * @param stringInitializer Function reference to the [CsvObject] inline class constructor that constructs the CsvObject instance from a string.
+ * @param keyFunction Function that returns the unique key or id of an object of type [T]. This function should accept parameters of both type [T] and [C].
+ * @param key The key of the item to find
+ *
+ * @param T The type of GtfsObject being deleted
+ * @param C The type of the inline class used to wrap a List<String?> as a [T]
+ * @param R The type of of the key or id of each [T]
+ *
+ * @return List of all items that match the key
+ */
 inline fun <T : GtfsObject, C : CsvObject<T>, R> getItemsByKey(path: Path, crossinline stringInitializer: (String) -> C, crossinline keyFunction: KeyFunction<R>, key: R): List<T> {
     return Files.lines(path).use { stream ->
         stream.skip(1)
@@ -131,6 +176,17 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> getItemsByKey(path: Path, cross
     }
 }
 
+/**
+ * Gets all items from a csv file.
+ *
+ * @param path Full path to the csv file
+ * @param stringInitializer Function reference to the [CsvObject] inline class constructor that constructs the CsvObject instance from a string.
+ *
+ * @param T The type of GtfsObject being deleted
+ * @param C The type of the inline class used to wrap a List<String?> as a [T]
+ *
+ * @return List of all items in the csv file.
+ */
 inline fun <T : GtfsObject, C : CsvObject<T>> getAllItems(path: Path, crossinline stringInitializer: (String) -> C): List<T> {
     return Files.lines(path).use { stream ->
         stream.skip(1)
