@@ -9,4 +9,6 @@ package ca.llamabagel.transpo.models.gtfs
  */
 data class CalendarDate(val serviceId: CalendarServiceId,
                         val date: String,
-                        val exceptionType: Int) : GtfsObject()
+                        val exceptionType: Int) : GtfsObject() {
+    companion object
+}

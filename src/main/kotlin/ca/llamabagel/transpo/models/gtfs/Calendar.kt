@@ -16,7 +16,9 @@ data class Calendar(val serviceId: CalendarServiceId,
                     val saturday: Int,
                     val sunday: Int,
                     val startDate: String,
-                    val endDate: String) : GtfsObject()
+                    val endDate: String) : GtfsObject() {
+    companion object
+}
 
 inline class CalendarServiceId(val value: String)
 fun String?.asCalendarServiceId() = if (this == null) null else CalendarServiceId(this)

@@ -18,7 +18,9 @@ data class Stop(val id: StopId,
                 val locationType: Int?,
                 val parentStation: String?,
                 val timeZone: String?,
-                val wheelchairBoarding: Int?) : GtfsObject()
+                val wheelchairBoarding: Int?) : GtfsObject() {
+    companion object
+}
 
 inline class StopId(val value: String)
 fun String?.asStopId() = if (this == null) null else StopId(this)

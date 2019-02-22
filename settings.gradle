@@ -1,12 +1,2 @@
-pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            if (!plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
-                useVersion("1.3.20")
-            }
-        }
-    }
-}
-
 rootProject.name = 'transpo-shared'
 
