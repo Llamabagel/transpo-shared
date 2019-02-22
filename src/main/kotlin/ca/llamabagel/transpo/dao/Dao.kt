@@ -5,9 +5,8 @@
 package ca.llamabagel.transpo.dao
 
 /**
- * A base Dao interface that contains the definitions
- * of the most basic Dao methods such as [getAll], [insert],
- * [update], and [delete].
+ * A base Dao interface that contains the definitions of the most basic Dao methods such as [getAll], [insert],
+ * and [delete].
  *
  * @param T The type of object being handled by this DAO.
  */
@@ -27,16 +26,6 @@ interface Dao<T> {
      * @return true if the given items were all inserted successfully, false if not
      */
     fun insert(vararg t: T): Boolean
-
-    /**
-     * Updates a [T] in the data source.
-     * The identifying property that determines which object is actually updated
-     * depends on the implementation.
-     *
-     * @param t One or more objects to update.
-     * @return true if the given items were all updated successfully, false if not
-     */
-    fun update(vararg t: T): Boolean
 
     /**
      * Deletes a [T] in the data source.

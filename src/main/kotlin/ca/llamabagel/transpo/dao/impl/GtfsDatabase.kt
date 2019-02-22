@@ -499,20 +499,6 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun update(vararg t: CalendarDate): Boolean {
-            val statement = connection.prepareStatement("UPDATE calendarDates SET exceptionType = ? WHERE serviceId = ? AND date = ?")
-
-            return statement.transact {
-                for (i in t) {
-                    setInt(1, i.exceptionType)
-                    setString(2, i.serviceId.value)
-                    setString(3, i.date)
-
-                    addBatch()
-                }
-            }
-        }
-
         override fun delete(vararg t: CalendarDate): Boolean {
             val statement = connection.prepareStatement("DELETE FROM calendarDates WHERE serviceId = ?")
 
@@ -580,27 +566,6 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setObject(8, i.dropOffType, Types.INTEGER)
                     setObject(9, i.shapeDistanceTraveled, Types.DOUBLE)
                     setObject(10, i.timepoint, Types.INTEGER)
-
-                    addBatch()
-                }
-            }
-        }
-
-        override fun update(vararg t: StopTime): Boolean {
-            val statement = connection.prepareStatement("UPDATE stopTimes SET arrivalTime = ?, departureTime = ?, stopSequence = ?, stopHeadsign = ?, pickupType = ?, dropOffType = ?, shapeDistanceTraveled = ?, timepoint = ? WHERE tripId = ? AND stopId = ?")
-
-            return statement.transact {
-                for (i in t) {
-                    setString(1, i.arrivalTime)
-                    setString(2, i.departureTime)
-                    setInt(3, i.stopSequence)
-                    setString(4, i.stopHeadsign)
-                    setObject(5, i.pickupType, Types.INTEGER)
-                    setObject(6, i.dropOffType, Types.INTEGER)
-                    setObject(7, i.shapeDistanceTraveled, Types.DOUBLE)
-                    setObject(8, i.timepoint, Types.INTEGER)
-                    setString(9, i.tripId.value)
-                    setString(10, i.stopId.value)
 
                     addBatch()
                 }

@@ -5,10 +5,11 @@
 package ca.llamabagel.transpo.dao.gtfs
 
 import ca.llamabagel.transpo.dao.Dao
+import ca.llamabagel.transpo.dao.UpdatableDao
 import ca.llamabagel.transpo.models.gtfs.Calendar
 import ca.llamabagel.transpo.models.gtfs.CalendarServiceId
 
-interface CalendarDao : Dao<Calendar> {
+interface CalendarDao : UpdatableDao<Calendar> {
 
     /**
      * Gets a [Calendar] by its serviceId. The serviceId is essentially the "name" of this

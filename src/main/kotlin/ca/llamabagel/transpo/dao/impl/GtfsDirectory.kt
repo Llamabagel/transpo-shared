@@ -234,10 +234,6 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
                     CalendarDate.key, ::CsvCalendarDate, *t)
         }
 
-        override fun update(vararg t: CalendarDate): Boolean {
-            return updateCsvRows(csvPath, ::CsvCalendarDate, ::CsvCalendarDate, CalendarDate.key, *t)
-        }
-
         override fun delete(vararg t: CalendarDate): Boolean {
             return deleteCsvRows(csvPath, ::CsvCalendarDate, CalendarDate.key, *t)
         }
@@ -273,10 +269,6 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
         override fun insert(vararg t: StopTime): Boolean {
             return insertCsvRows(csvPath, { getItemByKey(csvPath, ::CsvStopTime, StopTime.key, it) }, StopTime.key, ::CsvStopTime, *t)
-        }
-
-        override fun update(vararg t: StopTime): Boolean {
-            return updateCsvRows(csvPath, ::CsvStopTime, ::CsvStopTime, StopTime.key, *t)
         }
 
         override fun delete(vararg t: StopTime): Boolean {

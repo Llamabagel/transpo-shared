@@ -4,11 +4,11 @@
 
 package ca.llamabagel.transpo.dao.gtfs
 
-import ca.llamabagel.transpo.dao.Dao
+import ca.llamabagel.transpo.dao.UpdatableDao
 import ca.llamabagel.transpo.models.gtfs.Route
 import ca.llamabagel.transpo.models.gtfs.RouteId
 
-interface RouteDao : Dao<Route> {
+interface RouteDao : UpdatableDao<Route> {
 
     /**
      * Gets a [Route] by its route number.

@@ -302,18 +302,6 @@ class GtfsDatabaseTest {
     }
 
     @Test
-    fun testCalendarDateUpdate() {
-        val source = GtfsDatabase(postgres.testDatabase.connection)
-        val calendarDate = CalendarDate(CalendarServiceId("NewException"), "Today", 1)
-
-        source.calendarDates.insert(calendarDate)
-        val newCalendarDate = CalendarDate(CalendarServiceId("NewException"), "Today", 2)
-        assertTrue(source.calendarDates.update(newCalendarDate))
-        assertFalse(source.calendarDates.getByServiceId(calendarDate.serviceId).contains(calendarDate))
-        assertTrue(source.calendarDates.getByServiceId(calendarDate.serviceId).contains(newCalendarDate))
-    }
-
-    @Test
     fun testCalendarDateDelete() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
         val calendarDate = CalendarDate(CalendarServiceId("NewException"), "Today", 1)
@@ -358,19 +346,6 @@ class GtfsDatabaseTest {
         assertTrue(source.stopTimes.insert(stopTime))
         assertTrue(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
         assertEquals(stopTime, source.stopTimes.getByTripId(stopTime.tripId)[0])
-    }
-
-    @Test
-    fun testStopTimeUpdate() {
-        val source = GtfsDatabase(postgres.testDatabase.connection)
-
-        val stopTime = StopTime(TripId("ATrip"), "1:00", "1:00", StopId("AA100"), 1, null, null, null, null, null)
-        source.stopTimes.insert(stopTime)
-
-        val newStopTime = StopTime(TripId("ATrip"), "1:01", "1:01", StopId("AA100"), 1, "No", 1, 2, 0.1, 1)
-        assertTrue(source.stopTimes.update(newStopTime))
-        assertFalse(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
-        assertTrue(source.stopTimes.getByTripId(stopTime.tripId).contains(newStopTime))
     }
 
     @Test

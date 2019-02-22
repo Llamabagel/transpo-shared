@@ -4,10 +4,10 @@
 
 package ca.llamabagel.transpo.dao.gtfs
 
-import ca.llamabagel.transpo.dao.Dao
+import ca.llamabagel.transpo.dao.UpdatableDao
 import ca.llamabagel.transpo.models.gtfs.*
 
-interface TripDao : Dao<Trip> {
+interface TripDao : UpdatableDao<Trip> {
 
     /**
      * Gets a list of trips by run by a specified route based on the route's ID.
