@@ -49,6 +49,71 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         }
     }
 
+    protected open val agencyTable = csvTable<Agency> {
+        path = this@GtfsDirectory.path.resolve("agency.txt")
+        headers = listOf("agency_id", "agency_name", "agency_url", "agency_timezone", "agency_lang", "agency_phone", "fare_url", "agency_email")
+
+        objectInitializer {
+            Agency(it[0].asAgencyId()!!, it[1]!!, it[2]!!, it[3]!!, it[4].nullIfBlank(), it[5].nullIfBlank(), it[6].nullIfBlank(), it[7].nullIfBlank())
+        }
+
+        partsInitializer {
+            listOf(it.id.value, it.name, it.url, it.timeZone, it.language, it.phone, it.fareUrl, it.email)
+        }
+    }
+
+    protected open val calendarsTable = csvTable<Calendar> {
+        path = this@GtfsDirectory.path.resolve("calendar.txt")
+        headers = listOf("service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date", "end_date")
+
+        objectInitializer {
+            Calendar(it[0].asCalendarServiceId()!!, it[1]!!.toInt(), it[2]!!.toInt(), it[3]!!.toInt(), it[4]!!.toInt(), it[5]!!.toInt(), it[6]!!.toInt(), it[7]!!.toInt(), it[7]!!, it[8]!!)
+        }
+
+        partsInitializer {
+            listOf(it.serviceId.value, it.monday.toString(), it.tuesday.toString(), it.wednesday.toString(), it.thursday.toString(), it.friday.toString(), it.saturday.toString(), it.sunday.toString(), it.startDate, it.endDate)
+        }
+    }
+
+    protected open val calendarDatesTable = csvTable<CalendarDate> {
+        path = this@GtfsDirectory.path.resolve("calendar_dates.txt")
+        headers = listOf("service_id", "date", "exception_type")
+
+        objectInitializer {
+            CalendarDate(it[0].asCalendarServiceId()!!, it[1]!!, it[2]!!.toInt())
+        }
+
+        partsInitializer {
+            listOf(it.serviceId.value, it.date, it.exceptionType.toString())
+        }
+    }
+
+    protected open val stopTimesTable = csvTable<StopTime> {
+        path = this@GtfsDirectory.path.resolve("stop_times.txt")
+        headers = listOf("trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "stop_headsign", "pickup_type", "drop_off_type", "shape_distance_traveled", "timepoint")
+
+        objectInitializer {
+            StopTime(it[0].asTripId()!!, it[1]!!, it[2]!!, it[3].asStopId()!!, it[4]!!.toInt(), it[5].nullIfBlank(), it[6]?.toIntOrNull(), it[7]?.toIntOrNull(), it[8]?.toDoubleOrNull(), it[9]?.toIntOrNull())
+        }
+
+        partsInitializer {
+            listOf(it.tripId.value, it.arrivalTime, it.departureTime, it.stopId.value, it.stopSequence.toString(), it.stopHeadsign, it.pickupType?.toString(), it.dropOffType?.toString(), it.shapeDistanceTraveled?.toString(), it.timepoint?.toString())
+        }
+    }
+
+    protected open val tripsTable = csvTable<Trip> {
+        path = this@GtfsDirectory.path.resolve("trips.txt")
+        headers = listOf("route_id", "service_id", "trip_id", "headsign", "short_name", "direction_id", "block_id", "shape_id", "wheelchair_accessible", "bikes_allowed")
+
+        objectInitializer {
+            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), it[4].nullIfBlank(), it[5]?.toIntOrNull(), it[6].nullIfBlank(), it[7].nullIfBlank(), it[8]?.toIntOrNull(), it[9]?.toIntOrNull())
+        }
+
+        partsInitializer {
+            listOf(it.routeId.value, it.serviceId.value, it.tripId.value, it.headsign, it.shortName, it.directionId?.toString(), it.blockId, it.shapeId, it.wheelchairAccessible?.toString(), it.bikesAllowed?.toString())
+        }
+    }
+
     /**
      * GTFS directory and stops.txt implementation of the StopDao.
      * Reads the stops.txt file from a GTFS directory for its methods.
