@@ -5,17 +5,22 @@
 package ca.llamabagel.transpo.dao.impl
 
 import ca.llamabagel.transpo.models.gtfs.*
+import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import kotlin.reflect.*
+import kotlin.reflect.full.*
+import kotlin.reflect.jvm.javaType
+import kotlin.reflect.jvm.jvmErasure
 import kotlin.streams.toList
 
 typealias KeyFunction<R> = (Any) -> R?
+typealias CastFunction<T> = (String) -> T?
 
 val Stop.Companion.key: KeyFunction<StopId>
     get() = {
         when (it) {
-            is CsvStop -> it.id
             is Stop -> it.id
             else -> throw IllegalArgumentException("$it was not a Stop or CsvStop object")
         }
@@ -101,6 +106,18 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> insertCsvRows(path: Path, dupli
     return true
 }
 
+fun <T : GtfsObject, R> insertCsvRows(path: Path, key: KeyFunction<R>, duplicateChecker: (R) -> T?, converter: CsvObjectConverter<T>, vararg items: T): Boolean {
+    val lines = items.map {
+                if (duplicateChecker(key(it)!!) != null) return false
+        converter.getParts(it).toCsv()
+            }
+
+    Files.write(path, "\n".toByteArray(), StandardOpenOption.APPEND)
+    Files.write(path, lines, StandardOpenOption.APPEND)
+
+    return true
+}
+
 /**
  * Updates the rows of a list of objects in a csv file. Objects are updated based on a specified key.
  *
@@ -139,6 +156,28 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> updateCsvRows(path: Path, cross
     return false
 }
 
+fun <T : GtfsObject, R> updateCsvRows(path: Path, key: KeyFunction<R>, converter: CsvObjectConverter<T>, vararg items: T): Boolean {
+    val mapped = items.associateBy(key, { it }).toMutableMap()
+
+    val updatedLines = Files.lines(path).use { stream ->
+        stream.skip(1).map {
+            val csv = converter.createObject(it.split(","))
+
+            val csvKey = key(csv)
+            // If the object needs to be updated, map this line to the new line's value. Remove this stop from the stops map.
+            if (mapped.containsKey(csvKey)) converter.getParts(mapped.getValue(csvKey)).toCsv().also { mapped.remove(csvKey) } else it
+        }.toList()
+    }
+
+    // Make sure we've updated all lines, then write everything to the file
+    if (mapped.isEmpty()) {
+        Files.write(path, updatedLines)
+        return true
+    }
+
+    return false
+}
+
 /**
  * Deletes rows of a list of objects in a csv file. Objects are deleted based on a specified key.
  *
@@ -156,6 +195,9 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> updateCsvRows(path: Path, cross
 inline fun <T : GtfsObject, C : CsvObject<T>, R> deleteCsvRows(path: Path, crossinline stringInitializer: (String) -> C, crossinline key: KeyFunction<R>,
                                                                vararg objects: T): Boolean {
     val mapped = objects.associateBy(key, { it }).toMutableMap()
+    val headers = Files.lines(path).use {stream ->
+        stream.findFirst().get()
+    }
 
     val updatedLines = Files.lines(path).use { stream ->
         stream.map {
@@ -169,7 +211,8 @@ inline fun <T : GtfsObject, C : CsvObject<T>, R> deleteCsvRows(path: Path, cross
 
     // Make sure we've deleted all lines, then write everything to the file
     if (mapped.isEmpty()) {
-        Files.write(path, updatedLines)
+        Files.write(path, headers.toByteArray())
+        Files.write(path, updatedLines, StandardOpenOption.APPEND)
         return true
     }
 
@@ -279,49 +322,51 @@ interface CsvObject<T : GtfsObject> {
     }
 }
 
-@Target(AnnotationTarget.PROPERTY)
+fun List<String?>.toCsv() = this.joinToString(separator = ",") { it ?: "" }
+
+@Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class CsvHeader(val name: String)
 
-inline class CsvStop(val parts: MutableList<String?>) : CsvObject<Stop> {
+class CsvObjectConverter<T : GtfsObject>(private val clazz: KClass<T>, headers: List<String>) {
+    private val parameters: MutableMap<String, KParameter> = mutableMapOf()
+    private val properties: MutableMap<String, KProperty1<T, *>> = mutableMapOf()
 
-    constructor(string: String) : this(string.split(",").toMutableList<String?>())
+    init {
+        val params = clazz.primaryConstructor?.parameters
+        for (header in headers) {
+            val parameter = params?.find { param -> param.findAnnotation<CsvHeader>()?.name == header }
+            if (parameter != null) {
+                parameters[header] = parameter
+                val prop = clazz.declaredMemberProperties.find { it.name == parameter.name } ?: throw NullPointerException("Couldn't find matching property")
+                properties[header] = prop
+            }
+        }
+    }
 
-    constructor(stop: Stop)
-            : this(mutableListOf(stop.id.value, stop.code, stop.name, stop.description, stop.latitude.toString(),
-            stop.longitude.toString(), stop.zoneId?.toString(), stop.stopUrl, stop.locationType?.toString(),
-            stop.parentStation, stop.timeZone, stop.wheelchairBoarding?.toString()))
+    fun createObject(parts: List<String?>): T {
+        val params = mutableMapOf<KParameter, Any?>()
 
-    // Property accessors for a stop object. Gets the corresponding "part" from the csv.
-    @CsvHeader("stop_id")
-    inline var id: StopId
-        get() = parts[0].asStopId()!!
-        set(value) {
-            parts[0] = value.value
+        parameters.toList().forEachIndexed { index, pair ->
+            params[pair.second] = parts[index]
         }
 
-    @CsvHeader("stop_code")
-    inline var code: String?
-        get() = parts[1].nullIfBlank()
-        set(value) {
-            parts[1] = value
+        return clazz.primaryConstructor!!.callBy(params)
+    }
+
+    fun getParts(obj: T): List<String?> {
+        val parts = mutableListOf<String?>()
+
+        properties.forEach { _, prop ->
+            parts.add(prop.get(obj)?.toString())
         }
 
-    inline val name: String get() = parts[2]!!
-    inline val description: String? get() = parts[3].nullIfBlank()
-    inline val latitude: Double get() = parts[4]?.toDoubleOrNull() ?: Double.NaN
-    inline val longitude: Double get() = parts[5]?.toDoubleOrNull() ?: Double.NaN
-    inline val zoneId: Int? get() = parts[6]?.toIntOrNull()
-    inline val stopUrl: String? get() = parts[7].nullIfBlank()
-    inline val locationType: Int? get() = parts[8]?.toIntOrNull()
-    inline val parentStation: String? get() = parts[9].nullIfBlank()
-    inline val timeZone: String? get() = parts[10].nullIfBlank()
-    inline val wheelchairBoarding: Int? get() = parts[11]?.toIntOrNull()
+        return parts
+    }
 
-    override fun toObject() = Stop(id, code, name, description, latitude, longitude,
-            zoneId, stopUrl, locationType, parentStation, timeZone, wheelchairBoarding)
-
-    override fun toCsvRow(): String = CsvObject.partsToCsv(parts)
+    private fun castParameter(parameter: KParameter, value: Any?): Any? {
+        return null ///parameter.type.jvmErasure
+    }
 }
 
 inline class CsvRoute(val parts: List<String?>) : CsvObject<Route> {

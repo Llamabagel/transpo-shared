@@ -18,18 +18,34 @@ import java.nio.file.Path
  */
 open class GtfsDirectory(val path: Path) : GtfsSource() {
 
-    protected open val stopHeaders = listOf("stop_id", "stop_code", "stop_name", "stop_desc", "stop_lat", "stop_lon",
-            "zone_id", "stop_url", "location_type", "parent_station", "time_zone", "wheelchair_boarding")
+    protected open val stopsTable = csvTable<Stop> {
+        path = this@GtfsDirectory.path.resolve("stops.txt")
+        headers = listOf("stop_id", "stop_code", "stop_name", "stop_desc", "stop_lat", "stop_lon",
+                "zone_id", "stop_url", "location_type", "parent_station", "time_zone", "wheelchair_boarding")
 
-    init {
-        val stopsCsv = path.resolve("stops.txt")
-        if (Files.notExists(stopsCsv)) {
-            Files.createFile(stopsCsv)
+        objectInitializer {
+            Stop(it[0].asStopId()!!, it[1].nullIfBlank(), it[2]!!, it[3].nullIfBlank(), it[4]?.toDoubleOrNull()
+                    ?: Double.NaN, it[5]?.toDoubleOrNull()
+                    ?: Double.NaN, it[6]?.toIntOrNull(), it[7].nullIfBlank(), it[8]?.toIntOrNull(), it[9].nullIfBlank(), it[10].nullIfBlank(), it[11]?.toIntOrNull())
         }
 
-        val stopsHeaders = "stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,time_zone,wheelchair_boarding"
-        if (Files.lines(stopsCsv).use { it.findFirst().get() } != stopsHeaders) {
-            Files.write(stopsCsv, listOf(stopsHeaders))
+        partsInitializer {
+            listOf(it.id.value, it.code, it.name, it.description, it.latitude.toString(), it.longitude.toString(),
+                    it.zoneId?.toString(), it.stopUrl, it.locationType?.toString(), it.parentStation, it.timeZone,
+                    it.wheelchairBoarding?.toString())
+        }
+    }
+
+    protected open val routesTable = csvTable<Route> {
+        path = this@GtfsDirectory.path.resolve("routes.txt")
+        headers = listOf("route_id", "agency_id", "route_short_name", "route_long_name", "route_desc", "route_type", "route_url", "route_color", "route_text_color", "sort_order")
+
+        objectInitializer {
+            Route(it[0].asRouteId()!!, it[1].nullIfBlank().asAgencyId(), it[2]!!, it[3]!!, it[4].nullIfBlank(), it[5]!!.toInt(), it[6].nullIfBlank(), it[7].nullIfBlank(), it[8].nullIfBlank(), it[9]?.toIntOrNull())
+        }
+
+        partsInitializer {
+            listOf(it.id.value, it.agencyId?.value, it.shortName, it.longName, it.description, it.type.toString(), it.url, it.color, it.textColor, it.sortOrder?.toString())
         }
     }
 
@@ -39,16 +55,13 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
      */
     override val stops = object : StopDao {
 
-        private val csvPath = path.resolve("stops.txt")
-
         override fun getById(id: StopId): Stop? {
-            return getItemByKey(csvPath, ::CsvStop, Stop.key, id)
+            return stopsTable.getItemByKey(Stop.key, id)
         }
 
         override fun getByCode(code: String): List<Stop> {
-            return getItemsByKey(csvPath, ::CsvStop, {
+            return stopsTable.getItemsByKey({
                 when (it) {
-                    is CsvStop -> it.code
                     is Stop -> it.code
                     else -> throw IllegalArgumentException("$it was not a Stop or CsvStop object")
                 }
@@ -56,19 +69,19 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         }
 
         override fun getAll(): List<Stop> {
-            return getAllItems(csvPath, ::CsvStop)
+            return stopsTable.getAllItems()
         }
 
         override fun insert(vararg t: Stop): Boolean {
-            return insertCsvRows(csvPath, this::getById, Stop.key, ::CsvStop, *t)
+            return stopsTable.insertCsvRows(Stop.key, this::getById, *t)
         }
 
         override fun update(vararg t: Stop): Boolean {
-            return updateCsvRows(csvPath, ::CsvStop, ::CsvStop, Stop.key, *t)
+            return stopsTable.updateCsvRows(Stop.key, *t)
         }
 
         override fun delete(vararg t: Stop): Boolean {
-            return deleteCsvRows(csvPath, ::CsvStop, Stop.key, *t)
+            return stopsTable.deleteCsvRows(Stop.key, *t)
         }
 
     }
@@ -77,14 +90,13 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
      * GTFS directory and stops.txt implementation of the RouteDao.
      * Reads the routes.txt file from a GTFS directory for its methods.
      */
-    override val routes = object : RouteDao {
+    override val routes: RouteDao = object : RouteDao {
 
         private val csvPath = path.resolve("routes.txt")
 
         override fun getByNumber(number: String): Route? {
-            return getItemByKey(csvPath, ::CsvRoute, {
+            return routesTable.getItemByKey({
                 when (it) {
-                    is CsvRoute -> it.shortName
                     is Route -> it.shortName
                     else -> throw IllegalArgumentException("$it was not a Route or CsvRoute object")
                 }
@@ -92,23 +104,23 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         }
 
         override fun getById(id: RouteId): Route? {
-            return getItemByKey(csvPath, ::CsvRoute, Route.key, id)
+            return routesTable.getItemByKey(Route.key, id)
         }
 
         override fun getAll(): List<Route> {
-            return getAllItems(csvPath, ::CsvRoute)
+            return routesTable.getAllItems()
         }
 
         override fun insert(vararg t: Route): Boolean {
-            return insertCsvRows(csvPath, this::getById, Route.key, ::CsvRoute, *t)
+            return routesTable.insertCsvRows(Route.key, this::getById, *t)
         }
 
         override fun update(vararg t: Route): Boolean {
-            return updateCsvRows(csvPath, ::CsvRoute, ::CsvRoute, Route.key, *t)
+            return routesTable.updateCsvRows(Route.key, *t)
         }
 
         override fun delete(vararg t: Route): Boolean {
-            return deleteCsvRows(csvPath, ::CsvRoute, Route.key, *t)
+            return routesTable.deleteCsvRows(Route.key, *t)
         }
 
     }
