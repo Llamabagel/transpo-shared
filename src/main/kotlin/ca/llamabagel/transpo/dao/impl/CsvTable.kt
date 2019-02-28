@@ -25,7 +25,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         }
     }
 
-    fun <R> insertCsvRows(key: KeyFunction<R>, duplicateChecker: (R) -> T?, vararg items: T): Boolean {
+    fun <R> insertCsvRows(key: KeyFunction<T, R>, duplicateChecker: (R) -> T?, vararg items: T): Boolean {
         val lines = items.map {
             if (duplicateChecker(key(it)!!) != null) return false
             partsInitializer(it).toCsv()
@@ -37,7 +37,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         return true
     }
 
-    fun <R> updateCsvRows(key: KeyFunction<R>, vararg items: T): Boolean {
+    fun <R> updateCsvRows(key: KeyFunction<T, R>, vararg items: T): Boolean {
         val mapped = items.associateBy(key, { it }).toMutableMap()
 
         val updatedLines = Files.lines(path).use { stream ->
@@ -59,7 +59,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         return false
     }
 
-    fun <R> deleteCsvRows(key: KeyFunction<R>, vararg objects: T): Boolean {
+    fun <R> deleteCsvRows(key: KeyFunction<T, R>, vararg objects: T): Boolean {
         val mapped = objects.associateBy(key, { it }).toMutableMap()
         val headers = Files.lines(path).use { stream ->
             stream.findFirst().get()
@@ -88,7 +88,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         return false
     }
 
-    fun <R> getItemByKey(keyFunction: KeyFunction<R>, key: R): T? {
+    fun <R> getItemByKey(keyFunction: KeyFunction<T, R>, key: R): T? {
         return Files.lines(path).use { stream ->
             var item: T? = null
 
@@ -104,7 +104,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         }
     }
 
-    fun <R> getItemsByKey(keyFunction: KeyFunction<R>, key: R): List<T> {
+    fun <R> getItemsByKey(keyFunction: KeyFunction<T, R>, key: R): List<T> {
         return Files.lines(path).use { stream ->
             stream.skip(1)
                     .filter { keyFunction(objectInitializer(it.split(","))) == key }

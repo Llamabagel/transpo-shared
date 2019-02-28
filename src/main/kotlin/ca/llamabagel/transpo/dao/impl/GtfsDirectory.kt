@@ -6,7 +6,6 @@ package ca.llamabagel.transpo.dao.impl
 
 import ca.llamabagel.transpo.dao.gtfs.*
 import ca.llamabagel.transpo.models.gtfs.*
-import java.nio.file.Files
 import java.nio.file.Path
 
 /**
@@ -125,12 +124,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         }
 
         override fun getByCode(code: String): List<Stop> {
-            return stopsTable.getItemsByKey({
-                when (it) {
-                    is Stop -> it.code
-                    else -> throw IllegalArgumentException("$it was not a Stop or CsvStop object")
-                }
-            }, code)
+            return stopsTable.getItemsByKey(Stop::code, code)
         }
 
         override fun getAll(): List<Stop> {
@@ -157,15 +151,8 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
      */
     override val routes: RouteDao = object : RouteDao {
 
-        private val csvPath = path.resolve("routes.txt")
-
         override fun getByNumber(number: String): Route? {
-            return routesTable.getItemByKey({
-                when (it) {
-                    is Route -> it.shortName
-                    else -> throw IllegalArgumentException("$it was not a Route or CsvRoute object")
-                }
-            }, number)
+            return routesTable.getItemByKey(Route::shortName, number)
         }
 
         override fun getById(id: RouteId): Route? {
@@ -192,35 +179,31 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
     override val agencies: AgencyDao = object : AgencyDao {
 
-        private val csvPath = path.resolve("agency.txt")
-
         override fun getById(id: AgencyId): Agency? {
-            return getItemByKey(csvPath, ::CsvAgency, Agency.key, id)
+            return agencyTable.getItemByKey(Agency.key, id)
         }
 
         override fun getAll(): List<Agency> {
-            return getAllItems(csvPath, ::CsvAgency)
+            return agencyTable.getAllItems()
         }
 
         override fun insert(vararg t: Agency): Boolean {
-            return insertCsvRows(csvPath, this::getById, Agency.key, ::CsvAgency, *t)
+            return agencyTable.insertCsvRows(Agency.key, ::getById, *t)
         }
 
         override fun update(vararg t: Agency): Boolean {
-            return updateCsvRows(csvPath, ::CsvAgency, ::CsvAgency, Agency.key, *t)
+            return agencyTable.updateCsvRows(Agency.key, *t)
         }
 
         override fun delete(vararg t: Agency): Boolean {
-            return deleteCsvRows(csvPath, ::CsvAgency, Agency.key, *t)
+            return agencyTable.deleteCsvRows(Agency.key, *t)
         }
     }
 
     override val calendars: CalendarDao = object : CalendarDao {
 
-        private val csvPath = path.resolve("calendar.txt")
-
         override fun getByServiceId(serviceId: CalendarServiceId): Calendar? {
-            return getItemByKey(csvPath, ::CsvCalendar, Calendar.key, serviceId)
+            return calendarsTable.getItemByKey(Calendar.key, serviceId)
         }
 
         override fun getByDays(monday: Int, tuesday: Int, wednesday: Int, thursday: Int, friday: Int, saturday: Int, sunday: Int): List<Calendar> {
@@ -233,178 +216,117 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
             if (saturday != -1) map[6] = saturday
             if (sunday != -1) map[7] = sunday
 
-            return getItemsByKey(csvPath, ::CsvCalendar, {
+            return calendarsTable.getItemsByKey({
                 val days = mutableMapOf<Int, Int>()
-                when (it) {
-                    is CsvCalendar -> {
-                        if (monday != -1) days[1] = it.monday
-                        if (tuesday != -1) days[2] = it.tuesday
-                        if (wednesday != -1) days[3] = it.wednesday
-                        if (thursday != -1) days[4] = it.thursday
-                        if (friday != -1) days[5] = it.friday
-                        if (saturday != -1) days[6] = it.saturday
-                        if (sunday != -1) days[7] = it.sunday
-                    }
-                    is Calendar -> {
-                        if (monday != -1) days[1] = it.monday
-                        if (tuesday != -1) days[2] = it.tuesday
-                        if (wednesday != -1) days[3] = it.wednesday
-                        if (thursday != -1) days[4] = it.thursday
-                        if (friday != -1) days[5] = it.friday
-                        if (saturday != -1) days[6] = it.saturday
-                        if (sunday != -1) days[7] = it.sunday
-                    }
-                    else -> throw IllegalArgumentException("$it was not a Calendar or CsvCalendar object")
-                }
+
+                if (monday != -1) days[1] = it.monday
+                if (tuesday != -1) days[2] = it.tuesday
+                if (wednesday != -1) days[3] = it.wednesday
+                if (thursday != -1) days[4] = it.thursday
+                if (friday != -1) days[5] = it.friday
+                if (saturday != -1) days[6] = it.saturday
+                if (sunday != -1) days[7] = it.sunday
+
 
                 return@getItemsByKey days
             }, map)
         }
 
         override fun getAll(): List<Calendar> {
-            return getAllItems(csvPath, ::CsvCalendar)
+            return calendarsTable.getAllItems()
         }
 
         override fun insert(vararg t: Calendar): Boolean {
-            return insertCsvRows(csvPath, this::getByServiceId, Calendar.key, ::CsvCalendar, *t)
+            return calendarsTable.insertCsvRows(Calendar.key, this::getByServiceId, *t)
         }
 
         override fun update(vararg t: Calendar): Boolean {
-            return updateCsvRows(csvPath, ::CsvCalendar, ::CsvCalendar, Calendar.key, *t)
+            return calendarsTable.updateCsvRows(Calendar.key, *t)
         }
 
         override fun delete(vararg t: Calendar): Boolean {
-            return deleteCsvRows(csvPath, ::CsvCalendar, Calendar.key, *t)
+            return calendarsTable.deleteCsvRows(Calendar.key, *t)
         }
     }
 
     override val calendarDates: CalendarDateDao = object : CalendarDateDao {
 
-        private val csvPath = path.resolve("calendar_dates.txt")
-
         override fun getByServiceId(serviceId: CalendarServiceId): List<CalendarDate> {
-            return getItemsByKey(csvPath, ::CsvCalendarDate, {
-                when (it) {
-                    is CsvCalendarDate -> it.serviceId
-                    is CalendarDate -> it.serviceId
-                    else -> throw IllegalArgumentException("$it was not a CalendarDate or CsvCalendarDate object")
-                }
-            }, serviceId)
+            return calendarDatesTable.getItemsByKey(CalendarDate::serviceId, serviceId)
         }
 
         override fun getByDate(date: String): List<CalendarDate> {
-            return getItemsByKey(csvPath, ::CsvCalendarDate, {
-                when (it) {
-                    is CsvCalendarDate -> it.date
-                    is CalendarDate -> it.date
-                    else -> throw IllegalArgumentException("$it was not a CalendarDate or CsvCalendarDate object")
-                }
-            }, date)
+            return calendarDatesTable.getItemsByKey(CalendarDate::date, date)
         }
 
         override fun getAll(): List<CalendarDate> {
-            return getAllItems(csvPath, ::CsvCalendarDate)
+            return calendarDatesTable.getAllItems()
         }
 
         override fun insert(vararg t: CalendarDate): Boolean {
-            return insertCsvRows(csvPath, { getItemByKey(csvPath, ::CsvCalendarDate, CalendarDate.key, it) },
-                    CalendarDate.key, ::CsvCalendarDate, *t)
+            return calendarDatesTable.insertCsvRows(CalendarDate.key, { calendarDatesTable.getItemByKey(CalendarDate.key, it) }, *t)
         }
 
         override fun delete(vararg t: CalendarDate): Boolean {
-            return deleteCsvRows(csvPath, ::CsvCalendarDate, CalendarDate.key, *t)
+            return calendarDatesTable.deleteCsvRows(CalendarDate.key, *t)
         }
     }
 
     override val stopTimes: StopTimeDao = object : StopTimeDao {
 
-        private val csvPath = path.resolve("stop_times.txt")
-
         override fun getByTripId(tripId: TripId): List<StopTime> {
-            return getItemsByKey(csvPath, ::CsvStopTime, {
-                when (it) {
-                    is CsvStopTime -> it.tripId
-                    is StopTime -> it.tripId
-                    else -> throw java.lang.IllegalArgumentException("$it was not a StopTime or CsvStopTime object")
-                }
-            }, tripId)
+            return stopTimesTable.getItemsByKey(StopTime::tripId, tripId)
         }
 
         override fun getByStopId(stopId: StopId): List<StopTime> {
-            return getItemsByKey(csvPath, ::CsvStopTime, {
-                when (it) {
-                    is CsvStopTime -> it.stopId
-                    is StopTime -> it.stopId
-                    else -> throw java.lang.IllegalArgumentException("$it was not a StopTime or CsvStopTime object")
-                }
-            }, stopId)
+            return stopTimesTable.getItemsByKey(StopTime::stopId, stopId)
         }
 
         override fun getAll(): List<StopTime> {
-            return getAllItems(csvPath, ::CsvStopTime)
+            return stopTimesTable.getAllItems()
         }
 
         override fun insert(vararg t: StopTime): Boolean {
-            return insertCsvRows(csvPath, { getItemByKey(csvPath, ::CsvStopTime, StopTime.key, it) }, StopTime.key, ::CsvStopTime, *t)
+            return stopTimesTable.insertCsvRows(StopTime.key, { stopTimesTable.getItemByKey(StopTime.key, it) }, *t)
         }
 
         override fun delete(vararg t: StopTime): Boolean {
-            return deleteCsvRows(csvPath, ::CsvStopTime, StopTime.key, *t)
+            return stopTimesTable.deleteCsvRows(StopTime.key, *t)
         }
     }
 
     override val trips: TripDao = object : TripDao {
 
-        private val csvPath = path.resolve("trips.txt")
-
         override fun getByRouteId(routeId: RouteId): List<Trip> {
-            return getItemsByKey(csvPath, ::CsvTrip, {
-                when (it) {
-                    is CsvTrip -> it.routeId
-                    is Trip -> it.routeId
-                    else -> throw java.lang.IllegalArgumentException("$it was not a Trip or CsvTrip object")
-                }
-            }, routeId)
+            return tripsTable.getItemsByKey(Trip::routeId, routeId)
         }
 
         override fun getByRouteId(routeId: RouteId, directionId: Int): List<Trip> {
-            return getItemsByKey(csvPath, ::CsvTrip, {
-                when (it) {
-                    is CsvTrip -> "${it.routeId.value}//${it.directionId}"
-                    is Trip -> "${it.routeId.value}//${it.directionId}"
-                    else -> throw java.lang.IllegalArgumentException("$it was not a Trip or CsvTrip object")
-                }
-            }, "${routeId.value}//$directionId")
+            return tripsTable.getItemsByKey({ "${it.routeId.value}//${it.directionId}" }, "${routeId.value}//$directionId")
         }
 
         override fun getByTripId(id: TripId): Trip? {
-            return getItemByKey(csvPath, ::CsvTrip, Trip.key, id)
+            return tripsTable.getItemByKey(Trip.key, id)
         }
 
         override fun getByServiceId(serviceId: CalendarServiceId): List<Trip> {
-            return getItemsByKey(csvPath, ::CsvTrip, {
-                when (it) {
-                    is CsvTrip -> it.serviceId
-                    is Trip -> it.serviceId
-                    else -> throw java.lang.IllegalArgumentException("$it was not a Trip or CsvTrip object")
-                }
-            }, serviceId)
+            return tripsTable.getItemsByKey(Trip::serviceId, serviceId)
         }
 
         override fun getAll(): List<Trip> {
-            return getAllItems(csvPath, ::CsvTrip)
+            return tripsTable.getAllItems()
         }
 
         override fun insert(vararg t: Trip): Boolean {
-            return insertCsvRows(csvPath, this::getByTripId, Trip.key, ::CsvTrip, *t)
+            return tripsTable.insertCsvRows(Trip.key, this::getByTripId, *t)
         }
 
         override fun update(vararg t: Trip): Boolean {
-            return updateCsvRows(csvPath, ::CsvTrip, ::CsvTrip, Trip.key, *t)
+            return tripsTable.updateCsvRows(Trip.key, *t)
         }
 
         override fun delete(vararg t: Trip): Boolean {
-            return deleteCsvRows(csvPath, ::CsvTrip, Trip.key, *t)
+            return tripsTable.deleteCsvRows(Trip.key, *t)
         }
     }
 
