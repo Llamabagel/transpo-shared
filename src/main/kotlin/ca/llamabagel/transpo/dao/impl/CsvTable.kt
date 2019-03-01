@@ -18,9 +18,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
     init {
         if (Files.notExists(path)) {
             Files.createFile(path)
-        }
 
-        if (Files.lines(path).use { it.findFirst().get() } != headers.toCsv()) {
             Files.write(path, listOf(headers.toCsv()))
         }
     }
