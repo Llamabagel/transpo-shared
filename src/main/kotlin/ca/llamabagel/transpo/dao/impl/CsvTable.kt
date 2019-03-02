@@ -40,7 +40,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
 
         val updatedLines = Files.lines(path).use { stream ->
             stream.skip(1).map {
-                val csv = objectInitializer(it.split(","))
+                val csv = objectInitializer(splitRow(it))
 
                 val csvKey = key(csv)
                 // If the object needs to be updated, map this line to the new line's value. Remove this stop from the stops map.
@@ -66,7 +66,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         val updatedLines = Files.lines(path).use { stream ->
             stream.skip(1)
                     .map {
-                        val csv = objectInitializer(it.split(","))
+                        val csv = objectInitializer(splitRow(it))
 
                         val csvKey = key(csv)
                         // If the object needs to be deleted, map this line to a blank value. Remove this stop from the stops map.
@@ -91,7 +91,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
             var item: T? = null
 
             stream.skip(1).forEach {
-                val csv = objectInitializer(it.split(","))
+                val csv = objectInitializer(splitRow(it))
                 if (keyFunction(csv) == key) {
                     item = csv
                     return@forEach
@@ -105,8 +105,8 @@ class CsvTable<T : GtfsObject>(private val path: Path,
     fun <R> getItemsByKey(keyFunction: KeyFunction<T, R>, key: R): List<T> {
         return Files.lines(path).use { stream ->
             stream.skip(1)
-                    .filter { keyFunction(objectInitializer(it.split(","))) == key }
-                    .map { objectInitializer(it.split(",")) }
+                    .filter { keyFunction(objectInitializer(splitRow(it))) == key }
+                    .map { objectInitializer(splitRow(it)) }
                     .toList()
         }
     }
@@ -114,8 +114,18 @@ class CsvTable<T : GtfsObject>(private val path: Path,
     fun getAllItems(): List<T> {
         return Files.lines(path).use { stream ->
             stream.skip(1)
-                    .map { objectInitializer(it.split(",")) }
+                    .map { objectInitializer(splitRow(it)) }
                     .toList()
+        }
+    }
+
+    private fun splitRow(row: String): List<String> {
+        return row.split(",").map {
+            if (it.startsWith("\"") && it.endsWith("\"")) {
+                it.removePrefix("\"").removeSuffix("\"")
+            } else {
+                it
+            }
         }
     }
 }

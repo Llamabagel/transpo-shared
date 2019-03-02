@@ -37,7 +37,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
     protected open val routesTable = csvTable<Route> {
         path = this@GtfsDirectory.path.resolve("routes.txt")
-        headers = listOf("route_id", "agency_id", "route_short_name", "route_long_name", "route_desc", "route_type", "route_url", "route_color", "route_text_color", "sort_order")
+        headers = listOf("route_id", "agency_id", "route_short_name", "route_long_name", "route_desc", "route_type", "route_url", "route_color", "route_text_color", "route_sort_order")
 
         objectInitializer {
             Route(it[0].asRouteId()!!, it[1].nullIfBlank().asAgencyId(), it[2]!!, it[3]!!, it[4].nullIfBlank(), it[5]!!.toInt(), it[6].nullIfBlank(), it[7].nullIfBlank(), it[8].nullIfBlank(), it[9]?.toIntOrNull())
@@ -50,7 +50,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
     protected open val agencyTable = csvTable<Agency> {
         path = this@GtfsDirectory.path.resolve("agency.txt")
-        headers = listOf("agency_id", "agency_name", "agency_url", "agency_timezone", "agency_lang", "agency_phone", "fare_url", "agency_email")
+        headers = listOf("agency_id", "agency_name", "agency_url", "agency_timezone", "agency_lang", "agency_phone", "agency_fare_url", "agency_email")
 
         objectInitializer {
             Agency(it[0].asAgencyId()!!, it[1]!!, it[2]!!, it[3]!!, it[4].nullIfBlank(), it[5].nullIfBlank(), it[6].nullIfBlank(), it[7].nullIfBlank())
@@ -66,7 +66,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         headers = listOf("service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date", "end_date")
 
         objectInitializer {
-            Calendar(it[0].asCalendarServiceId()!!, it[1]!!.toInt(), it[2]!!.toInt(), it[3]!!.toInt(), it[4]!!.toInt(), it[5]!!.toInt(), it[6]!!.toInt(), it[7]!!.toInt(), it[7]!!, it[8]!!)
+            Calendar(it[0].asCalendarServiceId()!!, it[1]!!.toInt(), it[2]!!.toInt(), it[3]!!.toInt(), it[4]!!.toInt(), it[5]!!.toInt(), it[6]!!.toInt(), it[7]!!.toInt(), it[8]!!, it[9]!!)
         }
 
         partsInitializer {
@@ -113,10 +113,6 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         }
     }
 
-    /**
-     * GTFS directory and stops.txt implementation of the StopDao.
-     * Reads the stops.txt file from a GTFS directory for its methods.
-     */
     override val stops = object : StopDao {
 
         override fun getById(id: StopId): Stop? {
@@ -142,13 +138,8 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         override fun delete(vararg t: Stop): Boolean {
             return stopsTable.deleteCsvRows(Stop.key, *t)
         }
-
     }
 
-    /**
-     * GTFS directory and stops.txt implementation of the RouteDao.
-     * Reads the routes.txt file from a GTFS directory for its methods.
-     */
     override val routes: RouteDao = object : RouteDao {
 
         override fun getByNumber(number: String): Route? {
@@ -174,7 +165,6 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         override fun delete(vararg t: Route): Boolean {
             return routesTable.deleteCsvRows(Route.key, *t)
         }
-
     }
 
     override val agencies: AgencyDao = object : AgencyDao {
@@ -218,6 +208,12 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
             return calendarsTable.getItemsByKey({
                 val days = mutableMapOf<Int, Int>()
+
+                // If no days are set return a key that can't match anything
+                if (monday == -1 && tuesday == -1 && wednesday == -1 && thursday == -1 && friday == -1 && saturday == -1 && sunday == -1) {
+                    days[0] = 2
+                    return@getItemsByKey days
+                }
 
                 if (monday != -1) days[1] = it.monday
                 if (tuesday != -1) days[2] = it.tuesday

@@ -1,0 +1,5 @@
+service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+JAN19-JANDA19-Weekday-26,1,1,1,1,1,0,0,201904,20190418
+JAN19-JANSA19-Saturday-02,0,0,0,0,0,1,0,20190209,20190420
+JAN19-JANSU19-Sunday-02,0,0,0,0,0,0,1,20190210,20190419
+JAN19-Reduced-Weekday-02,1,1,1,1,1,0,0,20190218,20190315

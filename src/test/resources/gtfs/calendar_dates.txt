@@ -1,0 +1,4 @@
+service_id,date,exception_type
+JAN19-d1930LoR-Weekday-01,20190212,2
+JAN19-d1900Sup-Weekday-01,20190215,2
+JAN19-JANDA19-Weekday-26,20190218,2

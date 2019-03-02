@@ -157,7 +157,7 @@ class GtfsDirectoryTest {
         assertNull(source.routes.getById(route.id))
     }
 
-   /* @Test
+    @Test
     fun testAgencyGetById() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
@@ -253,7 +253,7 @@ class GtfsDirectoryTest {
 
         val calendar = Calendar(CalendarServiceId("SERVICE"), 1, 0, 1, 0, 1, 0, 1, "Today", "Tomorrow")
         assertTrue(source.calendars.insert(calendar))
-        assertTrue(source.calendars.getByServiceId(calendar.serviceId) == calendar)
+        assertEquals(calendar, source.calendars.getByServiceId(calendar.serviceId))
     }
 
     @Test
@@ -265,8 +265,8 @@ class GtfsDirectoryTest {
 
         val newCalendar = Calendar(CalendarServiceId("SERVICE"), 0, 1, 0, 1, 0, 1, 0, "Yesterday", "Today")
         assertTrue(source.calendars.update(newCalendar))
-        assertFalse(source.calendars.getByServiceId(calendar.serviceId) == calendar)
-        assertTrue(source.calendars.getByServiceId(calendar.serviceId) == newCalendar)
+        assertNotEquals(calendar, source.calendars.getByServiceId(calendar.serviceId))
+        assertEquals(newCalendar, source.calendars.getByServiceId(calendar.serviceId))
     }
 
     @Test
@@ -318,18 +318,6 @@ class GtfsDirectoryTest {
     }
 
     @Test
-    fun testCalendarDateUpdate() {
-        val source = GtfsDirectory(testFolder.root.toPath())
-        val calendarDate = CalendarDate(CalendarServiceId("NewException"), "Today", 1)
-
-        source.calendarDates.insert(calendarDate)
-        val newCalendarDate = CalendarDate(CalendarServiceId("NewException"), "Today", 2)
-        assertTrue(source.calendarDates.update(newCalendarDate))
-        assertFalse(source.calendarDates.getByServiceId(calendarDate.serviceId).contains(calendarDate))
-        assertTrue(source.calendarDates.getByServiceId(calendarDate.serviceId).contains(newCalendarDate))
-    }
-
-    @Test
     fun testCalendarDateDelete() {
         val source = GtfsDirectory(testFolder.root.toPath())
         val calendarDate = CalendarDate(CalendarServiceId("NewException"), "Today", 1)
@@ -374,19 +362,6 @@ class GtfsDirectoryTest {
         assertTrue(source.stopTimes.insert(stopTime))
         assertTrue(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
         assertEquals(stopTime, source.stopTimes.getByTripId(stopTime.tripId)[0])
-    }
-
-    @Test
-    fun testStopTimeUpdate() {
-        val source = GtfsDirectory(testFolder.root.toPath())
-
-        val stopTime = StopTime(TripId("ATrip"), "1:00", "1:00", StopId("AA100"), 1, null, null, null, null, null)
-        source.stopTimes.insert(stopTime)
-
-        val newStopTime = StopTime(TripId("ATrip"), "1:01", "1:01", StopId("AA100"), 1, "No", 1, 2, 0.1, 1)
-        assertTrue(source.stopTimes.update(newStopTime))
-        assertFalse(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
-        assertTrue(source.stopTimes.getByTripId(stopTime.tripId).contains(newStopTime))
     }
 
     @Test
@@ -472,6 +447,6 @@ class GtfsDirectoryTest {
 
         assertTrue(source.trips.delete(trip))
         assertNull(source.trips.getByTripId(trip.tripId))
-    }*/
+    }
 
 }

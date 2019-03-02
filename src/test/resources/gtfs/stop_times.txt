@@ -1,0 +1,10 @@
+trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled,timepoint
+56994291-JAN19-301Shop-Weekday-01,08:49:00,08:49:00,WR285,1,,0,0,,
+56994291-JAN19-301Shop-Weekday-01,08:49:00,08:49:00,WR295,2,,0,0,,
+56994291-JAN19-301Shop-Weekday-01,08:50:00,08:50:00,WR245,3,,0,0,,
+56994291-JAN19-301Shop-Weekday-01,08:50:00,08:50:00,WR249,4,,0,0,,
+56994291-JAN19-301Shop-Weekday-01,08:50:00,08:50:00,WR255,5,,0,0,,
+59528499-JAN19-Reduced-Weekday-02,15:19:00,15:19:00,CK105,1,,0,0,,
+59528499-JAN19-Reduced-Weekday-02,15:19:00,15:19:00,CK110,2,,0,0,,
+59508566-JAN19-JANSA19-Saturday-02,12:51:00,12:51:00,CK110,2,,0,0,,
+59508566-JAN19-JANSA19-Saturday-02,12:50:00,12:50:00,CK105,1,,0,0,,
