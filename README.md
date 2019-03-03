@@ -6,7 +6,7 @@ A library of shared data classes, interfaces, and interface implementations used
 These classes are used in the [server](https://github.com/dellisd/transpo-server), [Android app](https://github.com/dellisd/Transpo), 
 and data management tools (to be written).
 
-##Quick Start
+## Quick Start
 To include the shared library in your project add the following to the `repositories` block of your gradle config:
 ```groovy
 maven { 
