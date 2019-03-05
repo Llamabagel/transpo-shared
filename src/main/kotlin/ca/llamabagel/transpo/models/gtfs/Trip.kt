@@ -14,7 +14,7 @@ data class Trip(val routeId: RouteId,
                 val shortName: String?,
                 val directionId: Int?,
                 val blockId: String?,
-                val shapeId: String?,
+                val shapeId: ShapeId?,
                 val wheelchairAccessible: Int?,
                 val bikesAllowed: Int?) : GtfsObject(){
     companion object

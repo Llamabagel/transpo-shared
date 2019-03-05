@@ -40,3 +40,9 @@ insert into trips (routeId, serviceId, tripId, headsign, directionId, blockId) v
 insert into trips (routeId, serviceId, tripId, headsign, directionId, blockId) values ('91-288', 'JAN19-JANDA19-Weekday-26', '57328740-JAN19-JANDA19-Weekday-26', 'Baseline', 1, '6647252');
 insert into trips (routeId, serviceId, tripId, headsign, directionId, blockId) values ('91-288', 'JAN19-JANDA19-Weekday-26', '57328743-JAN19-JANDA19-Weekday-26', 'Orléans', 0, '6647242');
 insert into trips (routeId, serviceId, tripId, headsign, directionId, blockId) values ('94-288', 'JAN19-JANDA19-Weekday-26', '57328746-JAN19-JANDA19-Weekday-26', 'Millennium', 1, '6647213');
+
+-- Add shapes data
+insert into shapes values ('A_shp', 45.1, -76.1, 0, null);
+insert into shapes values ('A_shp', 45.2, -76.2, 1, null);
+insert into shapes values ('A_shp', 45.3, -76.3, 2, null);
+insert into shapes values ('B_shp', 10.1, 11.1, 15, null);

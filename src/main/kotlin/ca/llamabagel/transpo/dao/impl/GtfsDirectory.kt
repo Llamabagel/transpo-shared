@@ -105,11 +105,24 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         headers = listOf("route_id", "service_id", "trip_id", "headsign", "short_name", "direction_id", "block_id", "shape_id", "wheelchair_accessible", "bikes_allowed")
 
         objectInitializer {
-            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), it[4].nullIfBlank(), it[5]?.toIntOrNull(), it[6].nullIfBlank(), it[7].nullIfBlank(), it[8]?.toIntOrNull(), it[9]?.toIntOrNull())
+            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), it[4].nullIfBlank(), it[5]?.toIntOrNull(), it[6].nullIfBlank(), it[7].nullIfBlank().asShapeId(), it[8]?.toIntOrNull(), it[9]?.toIntOrNull())
         }
 
         partsInitializer {
-            listOf(it.routeId.value, it.serviceId.value, it.tripId.value, it.headsign, it.shortName, it.directionId?.toString(), it.blockId, it.shapeId, it.wheelchairAccessible?.toString(), it.bikesAllowed?.toString())
+            listOf(it.routeId.value, it.serviceId.value, it.tripId.value, it.headsign, it.shortName, it.directionId?.toString(), it.blockId, it.shapeId?.value, it.wheelchairAccessible?.toString(), it.bikesAllowed?.toString())
+        }
+    }
+
+    protected open val shapesTable: CsvTable<Shape>? = csvTable {
+        path = this@GtfsDirectory.path.resolve("shapes.txt")
+        headers = listOf("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled")
+
+        objectInitializer {
+            Shape(it[0].asShapeId()!!, it[1]!!.toDouble(), it[2]!!.toDouble(), it[3]!!.toInt(), it[4]?.toDoubleOrNull())
+        }
+
+        partsInitializer {
+            listOf(it.id.value, it.latitude.toString(), it.longitude.toString(), it.sequence.toString(), it.distanceTraveled?.toString())
         }
     }
 
@@ -326,4 +339,23 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         }
     }
 
+    override val shapes: ShapeDao? = object : ShapeDao {
+        override fun getById(id: ShapeId): List<Shape> {
+            return shapesTable!!.getItemsByKey({ it.id }, id)
+        }
+
+        override fun getAll(): List<Shape> {
+            return shapesTable!!.getAllItems()
+        }
+
+        override fun insert(vararg t: Shape): Boolean {
+            return shapesTable!!.insertCsvRows({ "${it.id.value}//${it.sequence}" }, {
+                shapesTable!!.getItemByKey({ "${it.id.value}//${it.sequence}" }, it)
+            }, *t)
+        }
+
+        override fun delete(vararg t: Shape): Boolean {
+            return shapesTable!!.deleteCsvRows({ "${it.id.value}//${it.sequence}" }, *t)
+        }
+    }
 }

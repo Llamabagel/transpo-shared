@@ -683,7 +683,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setString(5, i.shortName)
                     setObject(6, i.directionId, Types.INTEGER)
                     setObject(7, i.blockId, Types.INTEGER)
-                    setString(8, i.shapeId)
+                    setString(8, i.shapeId?.value)
                     setObject(9, i.wheelchairAccessible, Types.INTEGER)
                     setObject(10, i.bikesAllowed, Types.INTEGER)
 
@@ -703,7 +703,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setString(4, i.shortName)
                     setObject(5, i.directionId, Types.INTEGER)
                     setObject(6, i.blockId, Types.INTEGER)
-                    setString(7, i.shapeId)
+                    setString(7, i.shapeId?.value)
                     setObject(8, i.wheelchairAccessible, Types.INTEGER)
                     setObject(9, i.bikesAllowed, Types.INTEGER)
                     setString(10, i.tripId.value)
@@ -734,6 +734,8 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             var bikesAllowed: Int? = resultSet.getInt("bikesAllowed")
             if (resultSet.wasNull()) bikesAllowed = null
 
+            val shapeId = resultSet.getString("shapeId")
+
             return Trip(
                     routeId = resultSet.getString("routeId").asRouteId()!!,
                     serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
@@ -742,9 +744,72 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     shortName = resultSet.getString("shortName"),
                     directionId = directionId,
                     blockId = resultSet.getString("blockId"),
-                    shapeId = resultSet.getString("shapeId"),
+                    shapeId = if (shapeId != null) ShapeId(shapeId) else null,
                     wheelchairAccessible = wheelchairAccessible,
                     bikesAllowed = bikesAllowed
+            )
+        }
+    }
+
+    override val shapes: ShapeDao? = object : ShapeDao {
+        override fun getById(id: ShapeId): List<Shape> {
+            val result = connection.prepareStatement("SELECT * FROM shapes WHERE id = ?")
+                    .apply {
+                        setString(1, id.value)
+                    }
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getShapeFromResultSet(it) else null }.toList()
+            }
+        }
+
+        override fun getAll(): List<Shape> {
+            val result = connection.prepareStatement("SELECT * FROM shapes")
+                    .executeQuery()
+
+            return result.use {
+                generateSequence { if (it.next()) getShapeFromResultSet(it) else null }.toList()
+            }
+        }
+
+        override fun insert(vararg t: Shape): Boolean {
+            val statement = connection.prepareStatement("INSERT INTO shapes VALUES (?, ?, ?, ?, ?)")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.id.value)
+                    setDouble(2, i.latitude)
+                    setDouble(3, i.longitude)
+                    setInt(4, i.sequence)
+                    setObject(5, i.distanceTraveled, Types.DOUBLE)
+                    addBatch()
+                }
+            }
+        }
+
+        override fun delete(vararg t: Shape): Boolean {
+            val statement = connection.prepareStatement("DELETE FROM shapes WHERE id = ? AND sequence = ?")
+
+            return statement.transact {
+                for (i in t) {
+                    setString(1, i.id.value)
+                    setInt(2, i.sequence)
+                    statement.addBatch()
+                }
+            }
+        }
+
+        private fun getShapeFromResultSet(resultSet: ResultSet): Shape {
+            var distanceTraveled: Double? = resultSet.getDouble("distanceTraveled")
+            if (resultSet.wasNull()) distanceTraveled = null
+
+            return Shape(
+                    id = ShapeId(resultSet.getString("id")),
+                    latitude = resultSet.getDouble("latitude"),
+                    longitude = resultSet.getDouble("longitude"),
+                    sequence = resultSet.getInt("sequence"),
+                    distanceTraveled = distanceTraveled
             )
         }
     }

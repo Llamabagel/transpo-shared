@@ -111,3 +111,13 @@ create table trips
   wheelchairAccessible integer,
   bikesAllowed         integer
 );
+
+-- Create shapes
+create table shapes
+(
+  id               text             not null,
+  latitude         double precision not null,
+  longitude        double precision not null,
+  sequence         integer          not null,
+  distanceTraveled double precision
+);

@@ -432,7 +432,7 @@ class GtfsDirectoryTest {
         val trip = Trip(RouteId("1-1"), CalendarServiceId("TestService"), TripId("Trip1"), "Forward", null, 0, null, null, null, null)
         source.trips.insert(trip)
 
-        val newTrip = Trip(trip.routeId, trip.serviceId, trip.tripId, "Backward", "No", 1, "1", "None", 1, 1)
+        val newTrip = Trip(trip.routeId, trip.serviceId, trip.tripId, "Backward", "No", 1, "1", "None".asShapeId(), 1, 1)
         assertTrue(source.trips.update(newTrip))
         assertNotEquals(trip, source.trips.getByTripId(trip.tripId))
         assertEquals(newTrip, source.trips.getByTripId(trip.tripId))
@@ -447,6 +447,43 @@ class GtfsDirectoryTest {
 
         assertTrue(source.trips.delete(trip))
         assertNull(source.trips.getByTripId(trip.tripId))
+    }
+
+    @Test
+    fun testShapeGetById() {
+        val source = GtfsDirectory(testFolder.root.toPath())
+
+        val shape = source.shapes?.getById("A_shp".asShapeId()!!)
+        assertNotNull(shape)
+        assertEquals(3, shape?.size)
+    }
+
+    @Test
+    fun testShapeGetAll() {
+        val source = GtfsDirectory(testFolder.root.toPath())
+
+        val shape = source.shapes?.getAll()
+        assertNotNull(shape)
+        assertEquals(4, shape?.size)
+    }
+
+    @Test
+    fun testShapeInsert() {
+        val source = GtfsDirectory(testFolder.root.toPath())
+
+        val shape = Shape("Test".asShapeId()!!, 12.0, 12.0, 1, 0.0)
+        assertTrue(source.shapes?.insert(shape)!!)
+        assertEquals(shape, source.shapes?.getById(shape.id)!![0])
+    }
+
+    @Test
+    fun testShapeDelete() {
+        val source = GtfsDirectory(testFolder.root.toPath())
+
+        val shape = Shape("Test".asShapeId()!!, 12.0, 12.0, 1, 0.0)
+        assertTrue(source.shapes?.insert(shape)!!)
+        assertTrue(source.shapes?.delete(shape)!!)
+        assertEquals(0, source.shapes?.getById(shape.id)!!.size)
     }
 
 }

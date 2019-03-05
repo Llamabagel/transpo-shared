@@ -22,8 +22,6 @@ data class Stop(val id: StopId,
     companion object
 }
 
-inline class StopId(val value: String) {
-    override fun toString(): String = value
-}
+inline class StopId(val value: String)
 
 fun String?.asStopId() = if (this == null) null else StopId(this)

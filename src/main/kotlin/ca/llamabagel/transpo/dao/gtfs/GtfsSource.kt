@@ -13,5 +13,6 @@ abstract class GtfsSource {
     abstract val routes: RouteDao
     abstract val stopTimes: StopTimeDao
     abstract val trips: TripDao
+    abstract val shapes: ShapeDao?
 
 }
