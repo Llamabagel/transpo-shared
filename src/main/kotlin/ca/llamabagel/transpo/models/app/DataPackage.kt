@@ -11,12 +11,13 @@ import java.util.*
  * The full package of app data that is sent by the server when the client downloads a data set.
  *
  * @property dataVersion A string indicating the version of data contained in this package
- * @property schemaVersion A string indicating what version of the scehma this data is stored in
+ * @see Version
+ * @property schemaVersion A string indicating what version of the schema this data is stored in
  * @property date The date at which this package was generated
  * @property data The actual data in the package
  * @see Data
  */
-data class DataPackage(@SerializedName("dataVersion") val dataVersion: String,
+data class DataPackage(@SerializedName("dataVersion") val dataVersion: Version,
                        @SerializedName("schemaVersion") val schemaVersion: Int,
                        @SerializedName("date") val date: Date,
                        @SerializedName("data") val data: Data)
@@ -40,3 +41,31 @@ data class Data(@SerializedName("stops") val stops: List<Stop>,
                 @SerializedName("routes") val routes: List<Route>,
                 @SerializedName("stopRoutes") val stopRoutes: List<StopRoute>,
                 @SerializedName("shapes") val shapes: List<RouteShape>)
+
+/**
+ * Inline wrapper around a version string that implements a custom comparable interface to allow for comparisons
+ * of different version strings.
+ */
+inline class Version(val value: String): Comparable<Version> {
+    override fun compareTo(other: Version): Int {
+        val thisParts = value.split("-")
+        val otherParts = other.value.split("-")
+
+        // Compare major version numbers
+        val thisMajor = thisParts[0].toInt()
+        val otherMajor = otherParts[0].toInt()
+        val majorDiff = thisMajor - otherMajor
+
+        if (majorDiff != 0) {
+            return majorDiff
+        }
+
+        // Compare revision numbers if major versions were the same
+        val thisRevision = if (thisParts.size > 1) thisParts[1].toInt() else 0
+        val otherRevision = if (otherParts.size > 1) otherParts[1].toInt() else 0
+        return  thisRevision - otherRevision
+    }
+
+    override fun toString(): String = value
+
+}
