@@ -23,20 +23,7 @@ data class Route(
         @PrimaryKey @ColumnInfo(name = "id") @SerializedName("id") val id: String,
         @ColumnInfo(name = "shortName") @SerializedName("shortName") val shortName: String,
         @ColumnInfo(name = "longName") @SerializedName("longName") val longName: String?,
-        @ColumnInfo(name = "fromHeading") @SerializedName("fromHeading") val fromHeading: String?,
-        @ColumnInfo(name = "toHeading") @SerializedName("toHeading") val toHeading: String?
-) {
-    /**
-     * An enum representing the different types of routes available
-     */
-    enum class Type {
-        NORMAl,
-        CONNEXION,
-        PEAK,
-        RAPID,
-        SCHOOL,
-        EVENT,
-        FREQUENT,
-        RAIL
-    }
-}
+        @ColumnInfo(name = "type") @SerializedName("type") val type: Int,
+        @ColumnInfo(name = "serviceLevel") @SerializedName("serviceLevel") val serviceLevel: String,
+        @ColumnInfo(name = "color") @SerializedName("color") val color: String
+)
