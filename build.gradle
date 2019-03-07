@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'ca.llamabagel.transpo'
-version 'git describe --tag --dirty'.execute().text.trim()
+version 'git describe --tag'.execute().text.trim()
 
 repositories {
     mavenCentral()
@@ -61,7 +61,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'ca.llamabagel.transpo'
             artifactId 'shared'
-            version 'git describe --tag --dirty'.execute().text.trim()
+            version 'git describe --tag'.execute().text.trim()
 
             from components.java
 
