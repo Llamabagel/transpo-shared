@@ -39,13 +39,16 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         val mapped = items.associateBy(key, { it }).toMutableMap()
 
         val updatedLines = Files.lines(path).use { stream ->
-            stream.skip(1).map {
-                val csv = objectInitializer(splitRow(it))
+            stream.skip(1)
+                    .filter {
+                        it.isNotBlank()
+                    }.map {
+                        val csv = objectInitializer(splitRow(it))
 
-                val csvKey = key(csv)
-                // If the object needs to be updated, map this line to the new line's value. Remove this stop from the stops map.
-                if (mapped.containsKey(csvKey)) partsInitializer(mapped.getValue(csvKey)).toCsv().also { mapped.remove(csvKey) } else it
-            }.toList()
+                        val csvKey = key(csv)
+                        // If the object needs to be updated, map this line to the new line's value. Remove this stop from the stops map.
+                        if (mapped.containsKey(csvKey)) partsInitializer(mapped.getValue(csvKey)).toCsv().also { mapped.remove(csvKey) } else it
+                    }.toList()
         }
 
         // Make sure we've updated all lines, then write everything to the file
@@ -66,6 +69,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         val updatedLines = Files.lines(path).use { stream ->
             stream.skip(1)
                     .map {
+                        if (it.isBlank()) return@map null
                         val csv = objectInitializer(splitRow(it))
 
                         val csvKey = key(csv)
@@ -91,6 +95,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
             var item: T? = null
 
             stream.skip(1).forEach {
+                if (it.isBlank()) return@forEach
                 val csv = objectInitializer(splitRow(it))
                 if (keyFunction(csv) == key) {
                     item = csv
@@ -105,7 +110,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
     fun <R> getItemsByKey(keyFunction: KeyFunction<T, R>, key: R): List<T> {
         return Files.lines(path).use { stream ->
             stream.skip(1)
-                    .filter { keyFunction(objectInitializer(splitRow(it))) == key }
+                    .filter { if (it.isNotBlank()) keyFunction(objectInitializer(splitRow(it))) == key else false }
                     .map { objectInitializer(splitRow(it)) }
                     .toList()
         }
@@ -114,6 +119,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
     fun getAllItems(): List<T> {
         return Files.lines(path).use { stream ->
             stream.skip(1)
+                    .filter { it.isNotBlank() }
                     .map { objectInitializer(splitRow(it)) }
                     .toList()
         }

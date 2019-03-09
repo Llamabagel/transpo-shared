@@ -1,0 +1,11 @@
+route_id,service_id,trip_id,trip_headsign,direction_id,block_id
+301-288,JAN19-301Shop-Weekday-01,56994291-JAN19-301Shop-Weekday-01,"Bayshore Carlingwood",0,6620464
+301-288,JAN19-301Shop-Weekday-01,56994293-JAN19-301Shop-Weekday-01,"Richmond Stittsville",1,6620464
+302-288,JAN19-302Shop-Weekday-01,57018693-JAN19-302Shop-Weekday-01,"St Laurent Pl Orlns",0,6622232
+302-288,JAN19-302Shop-Weekday-01,57018697-JAN19-302Shop-Weekday-01,"Cumberland",1,6622232
+303-288,JAN19-303Shop-Weekday-01,57018700-JAN19-303Shop-Weekday-01,"Carlingwd Bayshore",0,6622233
+303-288,JAN19-303Shop-Weekday-01,57018703-JAN19-303Shop-Weekday-01,"Dunrobin Carp",1,6622233
+304-288,JAN19-304Shop-Weekday-01,57018707-JAN19-304Shop-Weekday-01,"Billings Brdg S. Keys",0,6622234
+304-288,JAN19-304Shop-Weekday-01,57018711-JAN19-304Shop-Weekday-01,"Greely Metcalfe",1,6622234
+305-288,JAN19-305Shop-Weekday-01,56984356-JAN19-305Shop-Weekday-01,"Carlingwood",0,6619827
+305-288,JAN19-305Shop-Weekday-01,56984360-JAN19-305Shop-Weekday-01,"North Gower",1,6619827

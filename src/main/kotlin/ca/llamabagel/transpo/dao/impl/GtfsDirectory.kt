@@ -10,8 +10,10 @@ import java.nio.file.Path
 
 /**
  * A data source for GTFS data based out of a file directory containing the GTFS files.
- * This is currently designed to work with GTFS files provided by OC Transpo. Will require generalizations to support
- * most other GTFS data sets.
+ * This is a base implementation designed to work with a full and complete set of GTFS data where the tables
+ * contain every column as specified in the spec.
+ *
+ * This class can be subclassed to work with specific GTFS formats by specifying custom [CsvTable] instances.
  *
  * @property path The path to the directory containing the GTFS files
  */
@@ -102,7 +104,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
     protected open val tripsTable = csvTable<Trip> {
         path = this@GtfsDirectory.path.resolve("trips.txt")
-        headers = listOf("route_id", "service_id", "trip_id", "headsign", "short_name", "direction_id", "block_id", "shape_id", "wheelchair_accessible", "bikes_allowed")
+        headers = listOf("route_id", "service_id", "trip_id", "trip_headsign", "short_name", "direction_id", "block_id", "shape_id", "wheelchair_accessible", "bikes_allowed")
 
         objectInitializer {
             Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), it[4].nullIfBlank(), it[5]?.toIntOrNull(), it[6].nullIfBlank(), it[7].nullIfBlank().asShapeId(), it[8]?.toIntOrNull(), it[9]?.toIntOrNull())
