@@ -10,11 +10,12 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * Created by isaac on 7/19/2017.
+ *
  * @property stop The stop for this stop route
  * @property routeId The id of the route that passes through the stop.
  * @property directionId the direction that the route is travelling (either 0 or 1)
  */
-@Entity(tableName = "stop_routes", primaryKeys = ["stop", "routeId", "directionId"])
+@Entity(tableName = "stop_routes", primaryKeys = ["stopId", "routeId", "directionId"])
 data class StopRoute(@ColumnInfo(name = "stopId") @SerializedName("stopId") val stop: String,
                      @ColumnInfo(name = "routeId") @SerializedName("routeId") val routeId: String,
                      @ColumnInfo(name = "directionId") @SerializedName("directionId") val directionId: Int)

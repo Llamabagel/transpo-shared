@@ -7,12 +7,11 @@
 package ca.llamabagel.transpo.utils
 
 import ca.llamabagel.transpo.models.LatLng
-import ca.llamabagel.transpo.models.app.EncodedShapeData
 
 /**
  * Encodes a list of LatLngs into an encoded path string
  */
-fun List<LatLng>.encode(): EncodedShapeData {
+fun List<LatLng>.encode(): String {
     var lastLat = 0L
     var lastLng = 0L
 
@@ -32,14 +31,14 @@ fun List<LatLng>.encode(): EncodedShapeData {
         lastLng = lng
     }
 
-    return EncodedShapeData(result.toString())
+    return result.toString()
 }
 
 /**
  * Decodes an encoded path string into a list of LatLngs
  */
-fun EncodedShapeData.decode(): List<LatLng> {
-    val length = this.data.length
+fun String.decode(): List<LatLng> {
+    val length = this.length
 
     val path = mutableListOf<LatLng>()
     var index = 0
@@ -51,7 +50,7 @@ fun EncodedShapeData.decode(): List<LatLng> {
         var shift = 0
         var b: Int
         do {
-            b = this.data[index++].toInt() - 63 - 1
+            b = this[index++].toInt() - 63 - 1
             result += b shl shift
             shift += 5
         } while (b >= 0x1F)
@@ -60,7 +59,7 @@ fun EncodedShapeData.decode(): List<LatLng> {
         result = 1
         shift = 0
         do {
-            b = this.data[index++].toInt() - 63 - 1
+            b = this[index++].toInt() - 63 - 1
             result += b shl shift
             shift += 5
         } while (b >= 0x1F)
