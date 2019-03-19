@@ -72,7 +72,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setObject(7, i.zoneId, Types.INTEGER)
                     setString(8, i.stopUrl)
                     setObject(9, i.locationType, Types.INTEGER)
-                    setString(10, i.parentStation)
+                    setString(10, i.parentStation?.value)
                     setString(11, i.timeZone)
                     setObject(12, i.wheelchairBoarding, Types.INTEGER)
 
@@ -94,7 +94,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     setObject(6, i.zoneId, Types.INTEGER)
                     setString(7, i.stopUrl)
                     setObject(8, i.locationType, Types.INTEGER)
-                    setString(9, i.parentStation)
+                    setString(9, i.parentStation?.value)
                     setString(10, i.timeZone)
                     setObject(11, i.wheelchairBoarding, Types.INTEGER)
                     setString(12, i.id.value)
@@ -137,7 +137,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     zoneId = zoneId,
                     stopUrl = resultSet.getString("stopUrl"),
                     locationType = locationType,
-                    parentStation = resultSet.getString("parentStation"),
+                    parentStation = resultSet.getString("parentStation")?.asStopId(),
                     timeZone = resultSet.getString("timeZone"),
                     wheelchairBoarding = wheelchairBoarding
             )

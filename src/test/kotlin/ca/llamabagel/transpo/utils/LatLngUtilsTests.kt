@@ -5,7 +5,6 @@
 package ca.llamabagel.transpo.utils
 
 import ca.llamabagel.transpo.models.LatLng
-import ca.llamabagel.transpo.models.app.EncodedShapeData
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -18,12 +17,12 @@ class LatLngUtilsTests {
 
     @Test
     fun testEncode() {
-        assertEquals("ggftGzd`mMeFkOeGuPmH`@cG}P", latLngList.encode().data)
+        assertEquals("ggftGzd`mMeFkOeGuPmH`@cG}P", latLngList.encode())
     }
 
     @Test
     fun testDecode() {
-        val decoded = EncodedShapeData("ggftGzd`mMeFkOeGuPmH`@cG}P").decode()
+        val decoded = "ggftGzd`mMeFkOeGuPmH`@cG}P".decode()
         val maxDelta = 0.000001
 
         assertEquals(latLngList[0].latitude, decoded[0].latitude, maxDelta)

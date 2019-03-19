@@ -64,7 +64,7 @@ class GtfsDatabaseTest {
         source.stops.insert(stop)
 
         // Update each value except the id.
-        val newStop = Stop(StopId("BB200"), "1235", "UPDATE / TEST", "A description", -47.0, 78.0, 0, "url", 7, "AA100", "EST", 1)
+        val newStop = Stop(StopId("BB200"), "1235", "UPDATE / TEST", "A description", -47.0, 78.0, 0, "url", 7, StopId("AA100"), "EST", 1)
         source.stops.update(newStop)
         assertFalse(source.stops.getById(newStop.id) == stop)
         assertTrue(source.stops.getById(newStop.id) == newStop)

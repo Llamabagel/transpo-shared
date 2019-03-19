@@ -27,12 +27,12 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         objectInitializer {
             Stop(it[0].asStopId()!!, it[1].nullIfBlank(), it[2]!!, it[3].nullIfBlank(), it[4]?.toDoubleOrNull()
                     ?: Double.NaN, it[5]?.toDoubleOrNull()
-                    ?: Double.NaN, it[6]?.toIntOrNull(), it[7].nullIfBlank(), it[8]?.toIntOrNull(), it[9].nullIfBlank(), it[10].nullIfBlank(), it[11]?.toIntOrNull())
+                    ?: Double.NaN, it[6]?.toIntOrNull(), it[7].nullIfBlank(), it[8]?.toIntOrNull(), it[9].nullIfBlank()?.asStopId(), it[10].nullIfBlank(), it[11]?.toIntOrNull())
         }
 
         partsInitializer {
             listOf(it.id.value, it.code, it.name, it.description, it.latitude.toString(), it.longitude.toString(),
-                    it.zoneId?.toString(), it.stopUrl, it.locationType?.toString(), it.parentStation, it.timeZone,
+                    it.zoneId?.toString(), it.stopUrl, it.locationType?.toString(), it.parentStation?.value, it.timeZone,
                     it.wheelchairBoarding?.toString())
         }
     }

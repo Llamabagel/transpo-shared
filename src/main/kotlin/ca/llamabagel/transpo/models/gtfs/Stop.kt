@@ -16,7 +16,7 @@ data class Stop(val id: StopId,
                 val zoneId: Int?,
                 val stopUrl: String?,
                 val locationType: Int?,
-                val parentStation: String?,
+                val parentStation: StopId?,
                 val timeZone: String?,
                 val wheelchairBoarding: Int?) : GtfsObject() {
     companion object
