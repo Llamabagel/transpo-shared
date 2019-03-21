@@ -21,8 +21,8 @@ import com.google.gson.annotations.SerializedName
  */
 @Entity(tableName = "stop_routes", primaryKeys = ["stopId", "routeId", "directionId"],
         foreignKeys = [
-            ForeignKey(entity = Stop::class, parentColumns = ["id"], childColumns = ["stopId"]),
-            ForeignKey(entity = Route::class, parentColumns = ["id"], childColumns = ["routeId"])
+            ForeignKey(entity = Stop::class, parentColumns = ["id"], childColumns = ["stopId"], onDelete = ForeignKey.CASCADE),
+            ForeignKey(entity = Route::class, parentColumns = ["id"], childColumns = ["routeId"], onDelete = ForeignKey.CASCADE)
         ])
 data class StopRoute(@ColumnInfo(name = "stopId") @SerializedName("stopId") val stop: String,
                      @ColumnInfo(name = "routeId") @SerializedName("routeId") val routeId: String,

@@ -18,7 +18,7 @@ import com.google.gson.annotations.SerializedName
  * @property shapeData The encoded polyline data.
  */
 @Entity(tableName = "route_shapes", primaryKeys = ["routeId", "shapeId"],
-        foreignKeys = [ForeignKey(entity = Route::class, parentColumns = ["id"], childColumns = ["routeId"])])
+        foreignKeys = [ForeignKey(entity = Route::class, parentColumns = ["id"], childColumns = ["routeId"], onDelete = ForeignKey.CASCADE)])
 data class RouteShape(@ColumnInfo(name = "routeId") @SerializedName("routeId") val routeId: String,
                       @ColumnInfo(name = "shapeId") @SerializedName("shapeId") val shapeId: String,
                       @ColumnInfo(name = "shapeData") @SerializedName("shapeData") val shapeData: String)
