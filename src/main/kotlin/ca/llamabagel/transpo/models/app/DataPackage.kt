@@ -4,11 +4,15 @@
 
 package ca.llamabagel.transpo.models.app
 
+import ca.llamabagel.transpo.models.transit.Route
+import ca.llamabagel.transpo.models.transit.RouteShape
+import ca.llamabagel.transpo.models.transit.Stop
+import ca.llamabagel.transpo.models.transit.StopRoute
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
 /**
- * The full package of app data that is sent by the server when the client downloads a data set.
+ * The full package of transit data that is sent by the server when the client downloads a data set.
  *
  * @property dataVersion A string indicating the version of data contained in this package
  * @see Version

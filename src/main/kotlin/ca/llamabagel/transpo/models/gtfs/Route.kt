@@ -5,7 +5,7 @@
 package ca.llamabagel.transpo.models.gtfs
 
 /**
- * [https://developers.google.com/app/gtfs/reference/#routestxt]
+ * [https://developers.google.com/transit/gtfs/reference/#routestxt]
  */
 data class Route(val id: RouteId,
                  val agencyId: AgencyId?,

@@ -2,7 +2,7 @@
  * Copyright (c) 2019 Derek Ellis. Subject to the MIT license.
  */
 
-package ca.llamabagel.transpo.models.app
+package ca.llamabagel.transpo.models.transit
 
 import com.google.gson.annotations.SerializedName
 

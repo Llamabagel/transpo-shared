@@ -2,15 +2,13 @@
  * Copyright (c) 2019 Derek Ellis. Subject to the MIT license.
  */
 
-package ca.llamabagel.transpo.models.app
+package ca.llamabagel.transpo.models.transit
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import ca.llamabagel.transpo.models.LatLng
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 
 /**
  * A stop object. Represents a station, bus stop, train station, etc.

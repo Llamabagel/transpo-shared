@@ -2,8 +2,9 @@
  * Copyright (c) 2019 Derek Ellis. Subject to the MIT license.
  */
 
-package ca.llamabagel.transpo.models.app
+package ca.llamabagel.transpo.models.transit
 
+import ca.llamabagel.transpo.models.app.Version
 import org.junit.Assert.*
 import org.junit.Test
 

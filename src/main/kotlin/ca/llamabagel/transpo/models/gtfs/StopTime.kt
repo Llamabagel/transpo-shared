@@ -5,7 +5,7 @@
 package ca.llamabagel.transpo.models.gtfs
 
 /**
- * [https://developers.google.com/app/gtfs/reference/#stop_timestxt]
+ * [https://developers.google.com/transit/gtfs/reference/#stop_timestxt]
  */
 data class StopTime(val tripId: TripId,
                     val arrivalTime: String,

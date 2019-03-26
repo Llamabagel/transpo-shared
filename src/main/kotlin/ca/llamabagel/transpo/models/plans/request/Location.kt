@@ -5,7 +5,7 @@
 package ca.llamabagel.transpo.models.plans.request
 
 import ca.llamabagel.transpo.models.LatLng
-import ca.llamabagel.transpo.models.app.Stop
+import ca.llamabagel.transpo.models.transit.Stop
 import com.google.gson.annotations.SerializedName
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
 
