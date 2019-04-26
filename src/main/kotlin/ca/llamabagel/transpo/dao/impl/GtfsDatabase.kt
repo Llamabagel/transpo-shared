@@ -82,7 +82,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun update(vararg t: Stop): Boolean {
-            val statement = connection.prepareStatement("UPDATE stops SET code = ?, name = ?, description = ?, latitude = ?, longitude = ?, zoneId = ?, stopUrl = ?, locationType = ?, parentStation = ?, timeZone = ?, wheelchairBoarding = ? WHERE id = ?")
+            val statement = connection.prepareStatement("UPDATE stops SET code = ?, name = ?, description = ?, latitude = ?, longitude = ?, zone_id = ?, stop_url = ?, location_type = ?, parent_station = ?, time_zone = ?, wheelchair_boarding = ? WHERE id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -118,13 +118,13 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
         private fun getStopFromResultSet(resultSet: ResultSet): Stop {
             // Handle nullable Integers
-            var zoneId: Int? = resultSet.getInt("zoneId")
+            var zoneId: Int? = resultSet.getInt("zone_id")
             if (resultSet.wasNull()) zoneId = null
 
-            var locationType: Int? = resultSet.getInt("locationType")
+            var locationType: Int? = resultSet.getInt("location_type")
             if (resultSet.wasNull()) locationType = null
 
-            var wheelchairBoarding: Int? = resultSet.getInt("wheelchairBoarding")
+            var wheelchairBoarding: Int? = resultSet.getInt("wheelchair_boarding")
             if (resultSet.wasNull()) wheelchairBoarding = null
 
             return Stop(
@@ -135,10 +135,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     latitude = resultSet.getDouble("latitude"),
                     longitude = resultSet.getDouble("longitude"),
                     zoneId = zoneId,
-                    stopUrl = resultSet.getString("stopUrl"),
+                    stopUrl = resultSet.getString("stop_url"),
                     locationType = locationType,
-                    parentStation = resultSet.getString("parentStation")?.asStopId(),
-                    timeZone = resultSet.getString("timeZone"),
+                    parentStation = resultSet.getString("parent_station")?.asStopId(),
+                    timeZone = resultSet.getString("time_zone"),
                     wheelchairBoarding = wheelchairBoarding
             )
         }
@@ -146,7 +146,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
     override val routes = object : RouteDao {
         override fun getByNumber(number: String): Route? {
-            val result = connection.prepareStatement("SELECT * FROM routes WHERE shortName = ?")
+            val result = connection.prepareStatement("SELECT * FROM routes WHERE short_name = ?")
                     .apply {
                         setString(1, number)
                     }
@@ -198,7 +198,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun update(vararg t: Route): Boolean {
-            val statement = connection.prepareStatement("UPDATE routes SET agencyId = ?, shortName = ?, longName = ?, description = ?, type = ?, url = ?, color = ?, textColor = ?, sortOrder = ? WHERE id = ?")
+            val statement = connection.prepareStatement("UPDATE routes SET agency_id = ?, short_name = ?, long_name = ?, description = ?, type = ?, url = ?, color = ?, text_color = ?, sort_order = ? WHERE id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -229,19 +229,19 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         private fun getRouteFromResultSet(resultSet: ResultSet): Route {
-            var sortOrder: Int? = resultSet.getInt("sortOrder")
+            var sortOrder: Int? = resultSet.getInt("sort_order")
             if (resultSet.wasNull()) sortOrder = null
 
             return Route(
                     id = resultSet.getString("id").asRouteId()!!,
-                    agencyId = resultSet.getString("agencyId").asAgencyId(),
-                    shortName = resultSet.getString("shortName"),
-                    longName = resultSet.getString("longName"),
+                    agencyId = resultSet.getString("agency_id").asAgencyId(),
+                    shortName = resultSet.getString("short_name"),
+                    longName = resultSet.getString("long_name"),
                     description = resultSet.getString("description"),
                     type = resultSet.getInt("type"),
                     url = resultSet.getString("url"),
                     color = resultSet.getString("color"),
-                    textColor = resultSet.getString("textColor"),
+                    textColor = resultSet.getString("text_color"),
                     sortOrder = sortOrder
             )
         }
@@ -287,7 +287,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun update(vararg t: Agency): Boolean {
-            val statement = connection.prepareStatement("UPDATE agencies SET name = ?, url = ?, timeZone = ?, language = ?, phone = ?, fareUrl = ?, email = ? WHERE id = ?")
+            val statement = connection.prepareStatement("UPDATE agencies SET name = ?, url = ?, time_zone = ?, language = ?, phone = ?, fare_url = ?, email = ? WHERE id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -319,17 +319,17 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                 id = resultSet.getString("id").asAgencyId()!!,
                 url = resultSet.getString("url"),
                 name = resultSet.getString("name"),
-                timeZone = resultSet.getString("timeZone"),
+                timeZone = resultSet.getString("time_zone"),
                 language = resultSet.getString("language"),
                 phone = resultSet.getString("phone"),
-                fareUrl = resultSet.getString("fareUrl"),
+                fareUrl = resultSet.getString("fare_url"),
                 email = resultSet.getString("email")
         )
     }
 
     override val calendars: CalendarDao = object : CalendarDao {
         override fun getByServiceId(serviceId: CalendarServiceId): Calendar? {
-            val result = connection.prepareStatement("SELECT * FROM calendars WHERE serviceId = ?")
+            val result = connection.prepareStatement("SELECT * FROM calendars WHERE service_id = ?")
                     .apply {
                         setString(1, serviceId.value)
                     }
@@ -406,7 +406,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun update(vararg t: Calendar): Boolean {
-            val statement = connection.prepareStatement("UPDATE calendars SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, saturday = ?, sunday = ?, startDate = ?, endDate = ? WHERE serviceId = ?")
+            val statement = connection.prepareStatement("UPDATE calendars SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, saturday = ?, sunday = ?, start_date = ?, end_date = ? WHERE service_id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -427,7 +427,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun delete(vararg t: Calendar): Boolean {
-            val statement = connection.prepareStatement("DELETE FROM calendars WHERE serviceId = ?")
+            val statement = connection.prepareStatement("DELETE FROM calendars WHERE service_id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -438,7 +438,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         private fun getCalendarFromResultSet(resultSet: ResultSet) = Calendar(
-                serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
+                serviceId = resultSet.getString("service_id").asCalendarServiceId()!!,
                 monday = resultSet.getInt("monday"),
                 tuesday = resultSet.getInt("tuesday"),
                 wednesday = resultSet.getInt("wednesday"),
@@ -446,14 +446,14 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                 friday = resultSet.getInt("friday"),
                 saturday = resultSet.getInt("saturday"),
                 sunday = resultSet.getInt("sunday"),
-                startDate = resultSet.getString("startDate"),
-                endDate =resultSet.getString("endDate")
+                startDate = resultSet.getString("start_date"),
+                endDate =resultSet.getString("end_date")
         )
     }
 
     override val calendarDates: CalendarDateDao = object : CalendarDateDao {
         override fun getByServiceId(serviceId: CalendarServiceId): List<CalendarDate> {
-            val result = connection.prepareStatement("SELECT * FROM calendarDates WHERE serviceId = ?")
+            val result = connection.prepareStatement("SELECT * FROM calendar_dates WHERE service_id = ?")
                     .apply {
                         setString(1, serviceId.value)
                     }
@@ -465,7 +465,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun getByDate(date: String): List<CalendarDate> {
-            val result = connection.prepareStatement("SELECT * FROM calendarDates WHERE date = ?")
+            val result = connection.prepareStatement("SELECT * FROM calendar_dates WHERE date = ?")
                     .apply {
                         setString(1, date)
                     }
@@ -477,7 +477,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun getAll(): List<CalendarDate> {
-            val result = connection.prepareStatement("SELECT * FROM calendarDates")
+            val result = connection.prepareStatement("SELECT * FROM calendar_dates")
                     .executeQuery()
 
             return result.use {
@@ -486,7 +486,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun insert(vararg t: CalendarDate): Boolean {
-            val statement = connection.prepareStatement("INSERT INTO calendarDates VALUES (?, ?, ?)")
+            val statement = connection.prepareStatement("INSERT INTO calendar_dates VALUES (?, ?, ?)")
 
             return statement.transact {
                 for (i in t) {
@@ -500,7 +500,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun delete(vararg t: CalendarDate): Boolean {
-            val statement = connection.prepareStatement("DELETE FROM calendarDates WHERE serviceId = ?")
+            val statement = connection.prepareStatement("DELETE FROM calendar_dates WHERE service_id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -511,15 +511,15 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         private fun getCalendarDateFromResultSet(resultSet: ResultSet) = CalendarDate(
-                serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
+                serviceId = resultSet.getString("service_id").asCalendarServiceId()!!,
                 date = resultSet.getString("date"),
-                exceptionType = resultSet.getInt("exceptionType")
+                exceptionType = resultSet.getInt("exception_type")
         )
     }
 
     override val stopTimes: StopTimeDao = object : StopTimeDao {
         override fun getByTripId(tripId: TripId): List<StopTime> {
-            val result = connection.prepareStatement("SELECT * FROM stopTimes WHERE tripId = ?")
+            val result = connection.prepareStatement("SELECT * FROM stop_times WHERE trip_id = ?")
                     .apply {
                         setString(1, tripId.value)
                     }
@@ -531,7 +531,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun getByStopId(stopId: StopId): List<StopTime> {
-            val result = connection.prepareStatement("SELECT * FROM stopTimes WHERE stopId = ?")
+            val result = connection.prepareStatement("SELECT * FROM stop_times WHERE stop_id = ?")
                     .apply {
                         setString(1, stopId.value)
                     }
@@ -543,7 +543,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun getAll(): List<StopTime> {
-            val result = connection.prepareStatement("SELECT * FROM stopTimes")
+            val result = connection.prepareStatement("SELECT * FROM stop_times")
                     .executeQuery()
 
             return result.use {
@@ -552,7 +552,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun insert(vararg t: StopTime): Boolean {
-            val statement = connection.prepareStatement("INSERT INTO stopTimes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            val statement = connection.prepareStatement("INSERT INTO stop_times VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 
             return statement.transact {
                 for (i in t) {
@@ -573,7 +573,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun delete(vararg t: StopTime): Boolean {
-            val statement = connection.prepareStatement("DELETE FROM stopTimes WHERE tripId = ? AND stopId = ?")
+            val statement = connection.prepareStatement("DELETE FROM stop_times WHERE trip_id = ? AND stop_id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -585,25 +585,25 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         private fun getStopTimeFromResultSet(resultSet: ResultSet): StopTime {
-            var pickupType: Int? = resultSet.getInt("pickupType")
+            var pickupType: Int? = resultSet.getInt("pickup_type")
             if (resultSet.wasNull()) pickupType = null
 
-            var dropOffType: Int? = resultSet.getInt("dropOffType")
+            var dropOffType: Int? = resultSet.getInt("drop_off_type")
             if (resultSet.wasNull()) dropOffType = null
 
-            var shapeDistanceTraveled: Double? = resultSet.getDouble("shapeDistanceTraveled")
+            var shapeDistanceTraveled: Double? = resultSet.getDouble("shape_distance_traveled")
             if (resultSet.wasNull()) shapeDistanceTraveled = null
 
             var timepoint: Int? = resultSet.getInt("timepoint")
             if (resultSet.wasNull()) timepoint = null
 
             return StopTime(
-                    tripId = resultSet.getString("tripId").asTripId()!!,
-                    arrivalTime = resultSet.getString("arrivalTime"),
-                    departureTime = resultSet.getString("departureTime"),
-                    stopId = resultSet.getString("stopId").asStopId()!!,
-                    stopSequence = resultSet.getInt("stopSequence"),
-                    stopHeadsign = resultSet.getString("stopHeadsign"),
+                    tripId = resultSet.getString("trip_id").asTripId()!!,
+                    arrivalTime = resultSet.getString("arrival_time"),
+                    departureTime = resultSet.getString("departure_time"),
+                    stopId = resultSet.getString("stop_id").asStopId()!!,
+                    stopSequence = resultSet.getInt("stop_sequence"),
+                    stopHeadsign = resultSet.getString("stop_headsign"),
                     pickupType = pickupType,
                     dropOffType = dropOffType,
                     shapeDistanceTraveled = shapeDistanceTraveled,
@@ -614,7 +614,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
 
     override val trips: TripDao = object : TripDao {
         override fun getByRouteId(routeId: RouteId): List<Trip> {
-            val result = connection.prepareStatement("SELECT * FROM trips WHERE routeId = ?")
+            val result = connection.prepareStatement("SELECT * FROM trips WHERE route_id = ?")
                     .apply {
                         setString(1, routeId.value)
                     }
@@ -626,7 +626,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun getByRouteId(routeId: RouteId, directionId: Int): List<Trip> {
-            val result = connection.prepareStatement("SELECT * FROM trips WHERE routeId = ? AND directionId = ?")
+            val result = connection.prepareStatement("SELECT * FROM trips WHERE route_id = ? AND direction_id = ?")
                     .apply {
                         setString(1, routeId.value)
                         setInt(2, directionId)
@@ -639,7 +639,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun getByTripId(id: TripId): Trip? {
-            val result = connection.prepareStatement("SELECT * FROM trips WHERE tripId = ?")
+            val result = connection.prepareStatement("SELECT * FROM trips WHERE trip_id = ?")
                     .apply {
                         setString(1, id.value)
                     }
@@ -651,7 +651,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun getByServiceId(serviceId: CalendarServiceId): List<Trip> {
-            val result = connection.prepareStatement("SELECT * FROM trips WHERE serviceId = ?")
+            val result = connection.prepareStatement("SELECT * FROM trips WHERE service_id = ?")
                     .apply {
                         setString(1, serviceId.value)
                     }
@@ -693,7 +693,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun update(vararg t: Trip): Boolean {
-            val statement = connection.prepareStatement("UPDATE trips SET routeId = ?, serviceId = ?, headsign = ?, shortName = ?, directionId = ?, blockId = ?, shapeId = ?, wheelchairAccessible =  ?, bikesAllowed = ? WHERE tripId = ?")
+            val statement = connection.prepareStatement("UPDATE trips SET route_id = ?, service_id = ?, headsign = ?, short_name = ?, direction_id = ?, block_id = ?, shape_id = ?, wheelchair_accessible =  ?, bikes_allowed = ? WHERE trip_id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -714,7 +714,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         override fun delete(vararg t: Trip): Boolean {
-            val statement = connection.prepareStatement("DELETE FROM trips WHERE tripId = ?")
+            val statement = connection.prepareStatement("DELETE FROM trips WHERE trip_id = ?")
 
             return statement.transact {
                 for (i in t) {
@@ -725,25 +725,25 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         private fun getTripFromResultSet(resultSet: ResultSet): Trip {
-            var directionId: Int? = resultSet.getInt("directionId")
+            var directionId: Int? = resultSet.getInt("direction_id")
             if (resultSet.wasNull()) directionId = null
 
-            var wheelchairAccessible: Int? = resultSet.getInt("wheelchairAccessible")
+            var wheelchairAccessible: Int? = resultSet.getInt("wheelchair_accessible")
             if (resultSet.wasNull()) wheelchairAccessible = null
 
-            var bikesAllowed: Int? = resultSet.getInt("bikesAllowed")
+            var bikesAllowed: Int? = resultSet.getInt("bikes_allowed")
             if (resultSet.wasNull()) bikesAllowed = null
 
-            val shapeId = resultSet.getString("shapeId")
+            val shapeId = resultSet.getString("shape_id")
 
             return Trip(
-                    routeId = resultSet.getString("routeId").asRouteId()!!,
-                    serviceId = resultSet.getString("serviceId").asCalendarServiceId()!!,
-                    tripId = resultSet.getString("tripId").asTripId()!!,
+                    routeId = resultSet.getString("route_id").asRouteId()!!,
+                    serviceId = resultSet.getString("service_id").asCalendarServiceId()!!,
+                    tripId = resultSet.getString("trip_id").asTripId()!!,
                     headsign = resultSet.getString("headsign"),
-                    shortName = resultSet.getString("shortName"),
+                    shortName = resultSet.getString("short_name"),
                     directionId = directionId,
-                    blockId = resultSet.getString("blockId"),
+                    blockId = resultSet.getString("block_id"),
                     shapeId = if (shapeId != null) ShapeId(shapeId) else null,
                     wheelchairAccessible = wheelchairAccessible,
                     bikesAllowed = bikesAllowed
@@ -801,7 +801,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
         }
 
         private fun getShapeFromResultSet(resultSet: ResultSet): Shape {
-            var distanceTraveled: Double? = resultSet.getDouble("distanceTraveled")
+            var distanceTraveled: Double? = resultSet.getDouble("distance_traveled")
             if (resultSet.wasNull()) distanceTraveled = null
 
             return Shape(

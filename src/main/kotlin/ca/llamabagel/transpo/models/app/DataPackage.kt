@@ -21,8 +21,8 @@ import java.util.*
  * @property data The actual data in the package
  * @see Data
  */
-data class DataPackage(@SerializedName("dataVersion") val dataVersion: Version,
-                       @SerializedName("schemaVersion") val schemaVersion: Int,
+data class DataPackage(@SerializedName("data_version") val dataVersion: Version,
+                       @SerializedName("schema_version") val schemaVersion: Int,
                        @SerializedName("date") val date: Date,
                        @SerializedName("data") val data: Data)
 
@@ -43,7 +43,7 @@ data class DataPackage(@SerializedName("dataVersion") val dataVersion: Version,
  */
 data class Data(@SerializedName("stops") val stops: List<Stop>,
                 @SerializedName("routes") val routes: List<Route>,
-                @SerializedName("stopRoutes") val stopRoutes: List<StopRoute>,
+                @SerializedName("stop_routes") val stopRoutes: List<StopRoute>,
                 @SerializedName("shapes") val shapes: List<RouteShape>)
 
 /**
