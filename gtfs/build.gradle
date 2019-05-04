@@ -1,0 +1,49 @@
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
+dependencies {
+    implementation "org.postgresql:postgresql:42.2.2"
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.25'
+    testImplementation 'com.opentable.components:otj-pg-embedded:0.13.1'
+    testImplementation "org.flywaydb:flyway-core:5.2.4"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'ca.llamabagel.transpo'
+            artifactId 'gtfs'
+            version 'git describe --tag'.execute().text.trim()
+
+            from components.java
+
+            artifact sourceJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    Properties properties = new Properties()
+    File propertiesFile = project.rootProject.file('local.properties')
+    if (propertiesFile.exists()) {
+        properties.load(propertiesFile.newDataInputStream())
+    }
+
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    //noinspection GroovyAccessibility
+    publications = ['maven']
+
+    pkg {
+        repo = 'transpo'
+        name = 'gtfs'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/dellisd/transpo-shared.git'
+    }
+}

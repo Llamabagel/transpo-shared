@@ -1,2 +1,3 @@
 rootProject.name = 'transpo-shared'
 
+include "shared", "gtfs", "config"

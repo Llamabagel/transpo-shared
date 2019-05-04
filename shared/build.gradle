@@ -1,0 +1,47 @@
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
+dependencies {
+    implementation "androidx.room:room-runtime:2.1.0-alpha01"
+    implementation 'com.google.code.gson:gson:2.8.4'
+
+    testImplementation 'junit:junit:4.12'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'ca.llamabagel.transpo'
+            artifactId 'shared'
+            version 'git describe --tag'.execute().text.trim()
+
+            from components.java
+
+            artifact sourceJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    Properties properties = new Properties()
+    File propertiesFile = project.rootProject.file('local.properties')
+    if (propertiesFile.exists()) {
+        properties.load(propertiesFile.newDataInputStream())
+    }
+
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    //noinspection GroovyAccessibility
+    publications = ['maven']
+
+    pkg {
+        repo = 'transpo'
+        name = 'shared'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/dellisd/transpo-shared.git'
+    }
+}
