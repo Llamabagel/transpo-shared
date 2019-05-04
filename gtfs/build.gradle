@@ -45,5 +45,8 @@ bintray {
         name = 'gtfs'
         licenses = ['MIT']
         vcsUrl = 'https://github.com/dellisd/transpo-shared.git'
+        version {
+            name = 'git describe --tag'.execute().text.trim()
+        }
     }
 }
