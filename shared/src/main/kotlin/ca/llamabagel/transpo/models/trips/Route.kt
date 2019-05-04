@@ -4,7 +4,7 @@
 
 package ca.llamabagel.transpo.models.trips
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 /**
  * Created by derek on 8/4/2017.
@@ -15,10 +15,9 @@ import com.google.gson.annotations.SerializedName
  * @property direction The direction of travel in words
  * @property heading The heading/destination of the route.
  */
-data class Route(
-        @SerializedName("number") val number: String,
-        @SerializedName("directionId") val directionId: Int,
-        @SerializedName("direction") val direction: String,
-        @SerializedName("heading") val heading: String,
-        @SerializedName("trips") val trips: List<Trip>
-)
+@Serializable
+data class Route(val number: String,
+                 val directionId: Int,
+                 val direction: String,
+                 val heading: String,
+                 val trips: List<Trip>)

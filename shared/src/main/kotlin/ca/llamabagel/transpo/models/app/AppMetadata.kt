@@ -4,7 +4,9 @@
 
 package ca.llamabagel.transpo.models.app
 
-import com.google.gson.annotations.SerializedName
+import ca.llamabagel.transpo.utils.DateSerializer
+import ca.llamabagel.transpo.utils.VersionSerializer
+import kotlinx.serialization.Serializable
 import java.util.*
 
 /**
@@ -23,7 +25,8 @@ import java.util.*
  * @property latestAppVersion The latest version of the app available on the requesting client's platform.
  * @property date The date at which this data object was generated.
  */
-data class AppMetadata(@SerializedName("dataVersion") val dataVersion: Version,
-                       @SerializedName("dataSchemaVersion") val dataSchemaVersion: Int,
-                       @SerializedName("latestAppVersion") val latestAppVersion: String,
-                       @SerializedName("date") val date: Date = Date())
+@Serializable
+data class AppMetadata(@Serializable(with = VersionSerializer::class) val dataVersion: Version,
+                       val dataSchemaVersion: Int,
+                       val latestAppVersion: String,
+                       @Serializable(with = DateSerializer::class) val date: Date = Date())

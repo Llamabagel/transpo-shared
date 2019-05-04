@@ -4,15 +4,16 @@
 
 package ca.llamabagel.transpo.models.transit
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
-data class StopTime(@SerializedName("tripId") val id: String,
-                    @SerializedName("arrivalTime") val arrivalTime: String,
-                    @SerializedName("departureTime") val departureTime: String,
-                    @SerializedName("stopId") val stopId: String,
-                    @SerializedName("stopSequence") val stopSequence: Int,
-                    @SerializedName("pickupType") val pickupType: Int,
-                    @SerializedName("dropOffType") val dropOffType: Int)
+@Serializable
+data class StopTime(val id: String,
+                    val arrivalTime: String,
+                    val departureTime: String,
+                    val stopId: String,
+                    val stopSequence: Int,
+                    val pickupType: Int,
+                    val dropOffType: Int)
 
 
 fun makeStopTime(time: String): StopTime = StopTime("", time, "", "", 0, 0, 0)

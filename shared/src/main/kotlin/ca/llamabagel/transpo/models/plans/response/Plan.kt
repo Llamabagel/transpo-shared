@@ -4,7 +4,5 @@
 
 package ca.llamabagel.transpo.models.plans.response
 
-import com.google.gson.annotations.SerializedName
-
-data class Plan(@SerializedName("summary") val summary: PlanSummary,
-                @SerializedName("steps") val steps: List<Step>)
+data class Plan(val summary: PlanSummary,
+                val steps: List<Step>)

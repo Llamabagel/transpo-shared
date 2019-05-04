@@ -4,10 +4,7 @@
 
 package ca.llamabagel.transpo.models.transit
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 /**
  * Data about a Route derived from GTFS data but simplified for in-client use.
@@ -19,12 +16,10 @@ import com.google.gson.annotations.SerializedName
  * @property serviceLevel The level of service, or how the route is branded (frequent, rapid, local, etc.)
  * @property color The colour to be used to display this route
  */
-@Entity(tableName = "routes")
-data class Route(
-        @PrimaryKey @ColumnInfo(name = "id") @SerializedName("id") val id: String,
-        @ColumnInfo(name = "shortName") @SerializedName("shortName") val shortName: String,
-        @ColumnInfo(name = "longName") @SerializedName("longName") val longName: String?,
-        @ColumnInfo(name = "type") @SerializedName("type") val type: Int,
-        @ColumnInfo(name = "serviceLevel") @SerializedName("serviceLevel") val serviceLevel: String,
-        @ColumnInfo(name = "color") @SerializedName("color") val color: String
-)
+@Serializable
+data class Route(val id: String,
+                 val shortName: String,
+                 val longName: String?,
+                 val type: Int,
+                 val serviceLevel: String,
+                 val color: String)

@@ -4,8 +4,9 @@
 
 package ca.llamabagel.transpo.models.plans.response
 
-import com.google.gson.annotations.SerializedName
-import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
+
+import kotlinx.serialization.PolymorphicSerializer
+import kotlinx.serialization.Serializable
 import java.util.*
 
 /**
@@ -19,17 +20,18 @@ import java.util.*
  * @see StepDetails
  * @property path An string-encoded polyline of the geometry of this step.
  */
-data class Step(@SerializedName("stepTime") val stepTime: Date,
-                @SerializedName("description") val description: String,
-                @SerializedName("type") val type: String,
-                @SerializedName("data") val data: StepDetails,
-                @SerializedName("path") val path: String)
+data class Step(val stepTime: Date,
+                val description: String,
+                val type: String,
+                val data: StepDetails,
+                val path: String)
 
 /**
  * Additional details about a step that can be conveyed to the user. There are different types of steps that could occur
  * during a travel plan that each contain very different data, so we use different classes to represent these extra pieces
  * of information. Each child of this class contains the information associated with a different type of step.
  */
+@Serializable
 sealed class StepDetails {
 
     /**
@@ -41,9 +43,10 @@ sealed class StepDetails {
      * to the same destination).
      * @property waitDuration The approx. scheduled wait duration in minutes.
      */
-    data class StopDetails(@SerializedName("stopId") val stopId: String,
-                           @SerializedName("routes") val routes: List<String>,
-                           @SerializedName("waitDuration") val waitDuration: Int) : StepDetails()
+    @Serializable(with = PolymorphicSerializer::class)
+    data class StopDetails(val stopId: String,
+                           val routes: List<String>,
+                           val waitDuration: Int) : StepDetails()
 
     /**
      * Details about traveling by bus. This is a step in which the user has boarded a bus (i.e. preceded by a [StopDetails])
@@ -54,9 +57,10 @@ sealed class StepDetails {
      * @property offStopId The ID of the stop the user should get off at.
      * @property duration Approx. how long this segment of bus travel is scheduled to be in minutes.
      */
-    data class BusDetails(@SerializedName("routes") val routes: List<String>,
-                          @SerializedName("offStopId") val offStopId: String,
-                          @SerializedName("duration") val duration: Int) : StepDetails()
+    @Serializable(with = PolymorphicSerializer::class)
+    data class BusDetails(val routes: List<String>,
+                          val offStopId: String,
+                          val duration: Int) : StepDetails()
 
     /**
      * Similar to [BusDetails] but by using a train line.
@@ -67,9 +71,10 @@ sealed class StepDetails {
      * @property offStopId The stop/station at which the user gets off
      * @property duration Approx. how long this segment of bus travel is scheduled to be in minutes.
      */
-    data class TrainDetails(@SerializedName("routes") val lines: List<String>,
-                            @SerializedName("offStopId") val offStopId: String,
-                            @SerializedName("duration") val duration: Int) : StepDetails()
+    @Serializable(with = PolymorphicSerializer::class)
+    data class TrainDetails(val lines: List<String>,
+                            val offStopId: String,
+                            val duration: Int) : StepDetails()
 
     /**
      * Details about a walking portion of the travel plan between two points.
@@ -78,18 +83,9 @@ sealed class StepDetails {
      * @property destination The name/description of the end point of the walk.
      * @property duration An estimate of how long it will take to walk this segment.
      */
-    data class WalkDetails(@SerializedName("origin") val origin: String,
-                           @SerializedName("destination") val destination: String,
-                           @SerializedName("duration") val duration: Int) : StepDetails()
+    @Serializable(with = PolymorphicSerializer::class)
+    data class WalkDetails(val origin: String,
+                           val destination: String,
+                           val duration: Int) : StepDetails()
 }
 
-/**
- * TypeAdapterFactory for serializing and deserializing [StepDetails] objects.
- * @see StepDetails
- */
-val stepDetailsTypeFactory: RuntimeTypeAdapterFactory<StepDetails> = RuntimeTypeAdapterFactory
-        .of(StepDetails::class.java, "type")
-        .registerSubtype(StepDetails.StopDetails::class.java, "stop")
-        .registerSubtype(StepDetails.BusDetails::class.java, "bus")
-        .registerSubtype(StepDetails.TrainDetails::class.java, "train")
-        .registerSubtype(StepDetails.WalkDetails::class.java, "walk")

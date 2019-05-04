@@ -4,6 +4,8 @@
 
 package ca.llamabagel.transpo.models.plans.request
 
+import kotlinx.serialization.Serializable
+
 /**
  * Enum describing the type of request being made in relation to the specified time in the request.
  * * ARRIVE_AT The plan should arrive at the destination at the specified time.

@@ -4,10 +4,7 @@
 
 package ca.llamabagel.transpo.models.transit
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 /**
  * Created by isaac on 7/19/2017.
@@ -19,12 +16,8 @@ import com.google.gson.annotations.SerializedName
  * This is a general sequence across the entire route and does not account for branches or individual trips. To get the
  * sequencing of stops along a specific trip on a route, use a Trip object instead.
  */
-@Entity(tableName = "stop_routes", primaryKeys = ["stopId", "routeId", "directionId"],
-        foreignKeys = [
-            ForeignKey(entity = Stop::class, parentColumns = ["id"], childColumns = ["stopId"], onDelete = ForeignKey.CASCADE),
-            ForeignKey(entity = Route::class, parentColumns = ["id"], childColumns = ["routeId"], onDelete = ForeignKey.CASCADE)
-        ])
-data class StopRoute(@ColumnInfo(name = "stopId", index = true) @SerializedName("stopId") val stop: String,
-                     @ColumnInfo(name = "routeId", index = true) @SerializedName("routeId") val routeId: String,
-                     @ColumnInfo(name = "directionId") @SerializedName("directionId") val directionId: Int,
-                     @ColumnInfo(name = "sequence") @SerializedName("sequence") val sequence: Int)
+@Serializable
+data class StopRoute(val stop: String,
+                     val routeId: String,
+                     val directionId: Int,
+                     val sequence: Int)

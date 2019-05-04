@@ -6,8 +6,8 @@ package ca.llamabagel.transpo.models.plans.request
 
 import ca.llamabagel.transpo.models.LatLng
 import ca.llamabagel.transpo.models.transit.Stop
-import com.google.gson.annotations.SerializedName
-import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
+import kotlinx.serialization.PolymorphicSerializer
+import kotlinx.serialization.Serializable
 
 
 /**
@@ -17,36 +17,30 @@ import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
  *
  * @property description An optional name/description of the location.
  */
-sealed class Location(@SerializedName("description") val description: String?) {
+@Serializable
+sealed class Location(val description: String?) {
 
     /**
      * A location defined as a "place" identified by its placeId as specified in the Google Places API.
      *
      * @property placeId This location's placeId from the Places API.
      */
-    class PlaceLocation(@SerializedName("placeId") val placeId: String, description: String?) : Location(description)
+    @Serializable(with = PolymorphicSerializer::class)
+    class PlaceLocation(val placeId: String, description: String?) : Location(description)
 
     /**
      * A location defined by a latitude and longitude (WGS84).
      *
      * @property latLng This location's latitude and longitude.
      */
-    class LatLngLocation(@SerializedName("latLng") val latLng: LatLng, description: String?) : Location(description)
+    @Serializable(with = PolymorphicSerializer::class)
+    class LatLngLocation(val latLng: LatLng, description: String?) : Location(description)
 
     /**
      * A location defined as a stop in the transit system.
      *
      * @property stop The stop.
      */
-    class StopLocation(@SerializedName("stop") val stop: Stop) : Location(stop.name)
-
+    @Serializable(with = PolymorphicSerializer::class)
+    class StopLocation(val stop: Stop) : Location(stop.name)
 }
-
-/**
- * TypeAdapterFactory for serializing and deserializing [Location] objects.
- * @see Location
- */
-val locationTypeFactory: RuntimeTypeAdapterFactory<Location> = RuntimeTypeAdapterFactory.of(Location::class.java, "type")
-        .registerSubtype(Location.PlaceLocation::class.java, "place")
-        .registerSubtype(Location.LatLngLocation::class.java, "latLng")
-        .registerSubtype(Location.StopLocation::class.java, "stop")

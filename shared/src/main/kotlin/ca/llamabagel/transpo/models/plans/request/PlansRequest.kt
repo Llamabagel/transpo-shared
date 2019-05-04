@@ -4,13 +4,13 @@
 
 package ca.llamabagel.transpo.models.plans.request
 
-import com.google.gson.annotations.JsonAdapter
-import com.google.gson.annotations.SerializedName
+import ca.llamabagel.transpo.utils.DateSerializer
+import kotlinx.serialization.Serializable
 import java.util.*
 
-data class PlansRequest(
-        @SerializedName("locations") val locations: List<Location>,
-        @SerializedName("date") val date: Date = Date(),
-        @SerializedName("allowBike") val allowBike: Boolean = false,
-        @SerializedName("requestTimeType") val requestTimeType: RequestTimeType = RequestTimeType.DEPART_AT
+@Serializable
+data class PlansRequest(val locations: List<Location>,
+                        @Serializable(with = DateSerializer::class) val date: Date = Date(),
+                        val allowBike: Boolean = false,
+                        val requestTimeType: RequestTimeType = RequestTimeType.DEPART_AT
 )

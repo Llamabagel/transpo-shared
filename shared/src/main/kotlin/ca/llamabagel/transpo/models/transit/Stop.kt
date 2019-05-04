@@ -4,11 +4,8 @@
 
 package ca.llamabagel.transpo.models.transit
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import ca.llamabagel.transpo.models.LatLng
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 /**
  * A stop object. Represents a station, bus stop, train station, etc.
@@ -22,15 +19,14 @@ import com.google.gson.annotations.SerializedName
  * @property parentStation If this stop is indicated as a station, it could have multiple stops or platforms within it.
  * This references another stop's id.
  */
-@Entity(tableName = "stops")
-data class Stop(@PrimaryKey @ColumnInfo(name = "id") @SerializedName("id") val id: String,
-                @ColumnInfo(name = "code") @SerializedName("code") val code: String,
-                @ColumnInfo(name = "name") @SerializedName("name") val name: String,
-                @ColumnInfo(name = "latitude") @SerializedName("latitude") val latitude: Double,
-                @ColumnInfo(name = "longitude") @SerializedName("longitude") val longitude: Double,
-                @ColumnInfo(name = "locationType") @SerializedName("locationType") val locationType: Int,
-                @ColumnInfo(name = "parentStation") @SerializedName("parentStation") val parentStation: String?) {
+@Serializable
+data class Stop(val id: String,
+                val code: String,
+                val name: String,
+                val latitude: Double,
+                val longitude: Double,
+                val locationType: Int,
+                val parentStation: String?) {
 
     fun getLocation(): LatLng = LatLng(latitude, longitude)
-
 }

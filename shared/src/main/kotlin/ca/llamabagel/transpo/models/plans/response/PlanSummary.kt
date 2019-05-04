@@ -4,7 +4,6 @@
 
 package ca.llamabagel.transpo.models.plans.response
 
-import com.google.gson.annotations.SerializedName
 import java.util.*
 
 /**
@@ -15,7 +14,7 @@ import java.util.*
  * @property travelTime The elapsed time between the start and end times in minutes (i.e. how long this travel plan takes)
  * @property travelWalkTime How much walking is required in minutes
  */
-data class PlanSummary(@SerializedName("startTime") val startTime: Date,
-                       @SerializedName("endTime") val endTime: Date,
-                       @SerializedName("travelTime") val travelTime: Int,
-                       @SerializedName("travelWalkTime") val travelWalkTime: Int)
+data class PlanSummary(val startTime: Date,
+                       val endTime: Date,
+                       val travelTime: Int,
+                       val travelWalkTime: Int)

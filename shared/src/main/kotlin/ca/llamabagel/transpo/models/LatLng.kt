@@ -4,7 +4,7 @@
 
 package ca.llamabagel.transpo.models
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 /**
  * Encapsulated WGS 84 Latitude and Longitude point.
@@ -12,5 +12,6 @@ import com.google.gson.annotations.SerializedName
  * @property latitude WGS 84 latitude (between -180 and 180)
  * @property longitude WGS 84 longitude (between -180 and 180)
  */
-data class LatLng(@SerializedName("latitude") var latitude: Double,
-                  @SerializedName("longitude") var longitude: Double)
+@Serializable
+data class LatLng(val latitude: Double,
+                  val longitude: Double)

@@ -5,7 +5,7 @@
 package ca.llamabagel.transpo.models.trips
 
 import ca.llamabagel.transpo.models.LatLng
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -25,20 +25,18 @@ import java.util.concurrent.TimeUnit
  * @property hasBikeRack Whether this bus is equipped with a bike rack.
  * @property punctuality A measure, in minutes, of how far off this trip's [adjustedScheduleTime] is from its scheduled time.
  */
-
-data class Trip(
-        @SerializedName("destination") val destination: String,
-        @SerializedName("startTime") val startTime: String,
-        @SerializedName("adjustedScheduleTime") val adjustedScheduleTime: Int,
-        @SerializedName("adjustmentAge") val adjustmentAge: Float,
-        @SerializedName("lastTripOfSchedule") val lastTripOfSchedule: Boolean,
-        @SerializedName("busType") val busType: String,
-        @SerializedName("latitude") val latitude: Double?,
-        @SerializedName("longitude") val longitude: Double?,
-        @SerializedName("gpsSpeed") val gpsSpeed: Float?,
-        @SerializedName("hasBikeRack") val hasBikeRack: Boolean,
-        @SerializedName("punctuality") val punctuality: Int
-) {
+@Serializable
+data class Trip(val destination: String,
+                val startTime: String,
+                val adjustedScheduleTime: Int,
+                val adjustmentAge: Float,
+                val lastTripOfSchedule: Boolean,
+                val busType: String,
+                val latitude: Double?,
+                val longitude: Double?,
+                val gpsSpeed: Float?,
+                val hasBikeRack: Boolean,
+                val punctuality: Int) {
 
     /**
      * Get a date object corresponding to the arrival time of this trip
