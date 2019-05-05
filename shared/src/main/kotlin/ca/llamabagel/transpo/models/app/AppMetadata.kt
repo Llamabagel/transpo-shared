@@ -5,7 +5,6 @@
 package ca.llamabagel.transpo.models.app
 
 import ca.llamabagel.transpo.utils.DateSerializer
-import ca.llamabagel.transpo.utils.VersionSerializer
 import kotlinx.serialization.Serializable
 import java.util.*
 
@@ -26,7 +25,7 @@ import java.util.*
  * @property date The date at which this data object was generated.
  */
 @Serializable
-data class AppMetadata(@Serializable(with = VersionSerializer::class) val dataVersion: Version,
+data class AppMetadata(val dataVersion: String,
                        val dataSchemaVersion: Int,
                        val latestAppVersion: String,
                        @Serializable(with = DateSerializer::class) val date: Date = Date())

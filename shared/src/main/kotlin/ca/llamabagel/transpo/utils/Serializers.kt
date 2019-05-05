@@ -4,7 +4,6 @@
 
 package ca.llamabagel.transpo.utils
 
-import ca.llamabagel.transpo.models.app.Version
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.StringDescriptor
 import java.text.DateFormat
@@ -25,17 +24,4 @@ object DateSerializer : KSerializer<Date> {
     override fun deserialize(decoder: Decoder): Date {
         return df.parse(decoder.decodeString())
     }
-}
-
-@Serializer(forClass = Version::class)
-object VersionSerializer : KSerializer<Version> {
-
-    override fun serialize(encoder: Encoder, obj: Version) {
-        encoder.encodeString(obj.value)
-    }
-
-    override fun deserialize(decoder: Decoder): Version {
-        return Version(decoder.decodeString())
-    }
-
 }

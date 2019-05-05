@@ -9,7 +9,6 @@ import ca.llamabagel.transpo.models.transit.RouteShape
 import ca.llamabagel.transpo.models.transit.Stop
 import ca.llamabagel.transpo.models.transit.StopRoute
 import ca.llamabagel.transpo.utils.DateSerializer
-import ca.llamabagel.transpo.utils.VersionSerializer
 import kotlinx.serialization.Serializable
 import java.util.*
 
@@ -24,7 +23,7 @@ import java.util.*
  * @see Data
  */
 @Serializable
-data class DataPackage(@Serializable(with = VersionSerializer::class) val dataVersion: Version,
+data class DataPackage(val dataVersion: String,
                        val schemaVersion: Int,
                        @Serializable(with = DateSerializer::class) val date: Date,
                        val data: Data)
@@ -49,31 +48,3 @@ data class Data(val stops: List<Stop>,
                 val routes: List<Route>,
                 val stopRoutes: List<StopRoute>,
                 val shapes: List<RouteShape>)
-
-/**
- * Inline wrapper around a version string that implements a custom comparable interface to allow for comparisons
- * of different version strings.
- */
-inline class Version(val value: String) : Comparable<Version> {
-    override fun compareTo(other: Version): Int {
-        val thisParts = value.split("-")
-        val otherParts = other.value.split("-")
-
-        // Compare major version numbers
-        val thisMajor = thisParts[0].toInt()
-        val otherMajor = otherParts[0].toInt()
-        val majorDiff = thisMajor - otherMajor
-
-        if (majorDiff != 0) {
-            return majorDiff
-        }
-
-        // Compare revision numbers if major versions were the same
-        val thisRevision = if (thisParts.size > 1) thisParts[1].toInt() else 0
-        val otherRevision = if (otherParts.size > 1) otherParts[1].toInt() else 0
-        return thisRevision - otherRevision
-    }
-
-    override fun toString(): String = value
-
-}
