@@ -32,11 +32,11 @@ data class Trip(val destination: String,
                 val adjustmentAge: Float,
                 val lastTripOfSchedule: Boolean,
                 val busType: String,
-                val latitude: Double?,
-                val longitude: Double?,
-                val gpsSpeed: Float?,
                 val hasBikeRack: Boolean,
-                val punctuality: Int) {
+                val punctuality: Int,
+                val latitude: Double? = null,
+                val longitude: Double? = null,
+                val gpsSpeed: Float? = null) {
 
     /**
      * Get a date object corresponding to the arrival time of this trip
