@@ -18,7 +18,7 @@ import java.util.*
  * Object representation of the config.properties file.
  * All properties are loaded and read when this object is initialized.
  */
-object Configuration {
+class Configuration(val root: String) {
     val SQL_USER: String
     val SQL_HOST: String
     val SQL_PORT: String
@@ -27,12 +27,12 @@ object Configuration {
     val DATA_PACKAGE_DIRECTORY: String
 
     init {
-        if (!Files.exists(Paths.get("config.properties"))) {
+        if (!Files.exists(Paths.get("$root/config.properties"))) {
             throw FileNotFoundException("config.properties file not found.")
         }
 
         val properties = Properties().apply {
-            load(FileInputStream("config.properties"))
+            load(FileInputStream("$root/config.properties"))
         }
 
         SQL_USER =
@@ -52,7 +52,6 @@ object Configuration {
      * Gets an SQL Connection to the SQL server specified in the configuration.
      * @return An SQL connection, or null if the connection failed.
      */
-    @JvmStatic
     fun getConnection(): Connection? {
         return try {
             DriverManager.getConnection("jdbc:postgresql://$SQL_HOST:$SQL_PORT/$SQL_DATABASE", SQL_USER, SQL_PASSWORD)
