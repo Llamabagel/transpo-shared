@@ -18,7 +18,7 @@ import java.util.*
  * @property guid The GUID for the post
  * @property featuredImageUrl The url to the update's featured image, if there is one.
  * @property affectedRoutes A list of routes by their number affected by this update
- * @property affectedStops A list of stops affected by this update by their stop codes
+ * @property affectedStops A list of stops affected by this update
  */
 @Serializable
 data class LiveUpdate(val title: String,
@@ -28,5 +28,5 @@ data class LiveUpdate(val title: String,
                       val description: String,
                       val guid: String,
                       val affectedRoutes: List<String> = emptyList(),
-                      val affectedStops: List<String> = emptyList(),
+                      val affectedStops: List<AffectedStop> = emptyList(),
                       val featuredImageUrl: String? = null)
