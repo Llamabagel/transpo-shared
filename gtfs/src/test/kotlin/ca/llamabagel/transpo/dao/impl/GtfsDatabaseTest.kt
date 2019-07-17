@@ -4,6 +4,8 @@
 
 package ca.llamabagel.transpo.dao.impl
 
+import ca.llamabagel.transpo.dao.gtfs.*
+import ca.llamabagel.transpo.dao.listAll
 import ca.llamabagel.transpo.models.gtfs.*
 import com.opentable.db.postgres.embedded.FlywayPreparer
 import com.opentable.db.postgres.junit.EmbeddedPostgresRules
@@ -33,7 +35,7 @@ class GtfsDatabaseTest {
     fun testStopGetByCode() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val result = source.stops.getByCode("3031")
+        val result = source.stops.listByCode("3031")
         assertTrue(result.size == 2)
         assertNotNull(result.find { stop -> stop.id == StopId("AF980") })
     }
@@ -42,7 +44,7 @@ class GtfsDatabaseTest {
     fun testStopGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val result = source.stops.getAll()
+        val result = source.stops.listAll()
         assertTrue(result.size == 5)
         assertNotNull(result.find { stop -> stop.id == StopId("AF980") })
     }
@@ -103,7 +105,7 @@ class GtfsDatabaseTest {
     fun testRouteGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val routes = source.routes.getAll()
+        val routes = source.routes.listAll()
         assertTrue(routes.size == 3)
         assertNotNull(routes.find { route -> route.id == RouteId("5-288") })
     }
@@ -154,7 +156,7 @@ class GtfsDatabaseTest {
     fun testAgencyGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val agencies = source.agencies.getAll()
+        val agencies = source.agencies.listAll()
         assertTrue(agencies.size == 1)
         assertNotNull(agencies.find { agency -> agency.name == "OC Transpo" })
     }
@@ -207,25 +209,25 @@ class GtfsDatabaseTest {
     fun testCalendarGetByDays() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val weekdays = source.calendars.getByDays(monday = 1, friday = 1)
+        val weekdays = source.calendars.listByDays(monday = 1, friday = 1)
         assertTrue(weekdays.size == 2)
         assertNotNull(weekdays.find { calendar -> calendar.serviceId == CalendarServiceId("JAN19-JANDA19-Weekday-26") })
 
-        val sundays = source.calendars.getByDays(monday = 0, sunday = 1)
+        val sundays = source.calendars.listByDays(monday = 0, sunday = 1)
         assertTrue(sundays.size == 1)
         assertNotNull(sundays.find { calendar -> calendar.serviceId == CalendarServiceId("JAN19-JANSU19-Sunday-02") })
 
-        val none = source.calendars.getByDays(monday = 1, sunday = 1)
+        val none = source.calendars.listByDays(monday = 1, sunday = 1)
         assertTrue(none.isEmpty())
 
-        assertTrue(source.calendars.getByDays().isEmpty())
+        assertTrue(source.calendars.listByDays().isEmpty())
     }
 
     @Test
     fun testCalendarGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val calendars = source.calendars.getAll()
+        val calendars = source.calendars.listAll()
 
         assertTrue(calendars.size == 4)
         assertNotNull(calendars.find { calendar -> calendar.serviceId == CalendarServiceId("JAN19-JANSU19-Sunday-02") })
@@ -268,7 +270,7 @@ class GtfsDatabaseTest {
     @Test
     fun testCalendarDateGetByServiceId() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
-        val calendarDates = source.calendarDates.getByServiceId(CalendarServiceId("JAN19-d1930LoR-Weekday-01"))
+        val calendarDates = source.calendarDates.listByServiceId(CalendarServiceId("JAN19-d1930LoR-Weekday-01"))
 
         assertTrue(calendarDates.size == 1)
         assertNotNull(calendarDates.find { calendarDate -> calendarDate.serviceId == CalendarServiceId("JAN19-d1930LoR-Weekday-01")})
@@ -277,7 +279,7 @@ class GtfsDatabaseTest {
     @Test
     fun testCalendarDateGetByDate() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
-        val calendarDates = source.calendarDates.getByDate("20190218")
+        val calendarDates = source.calendarDates.listByDate("20190218")
 
         assertTrue(calendarDates.size == 1)
         assertNotNull(calendarDates.find { calendarDate -> calendarDate.date == "20190218"})
@@ -286,7 +288,7 @@ class GtfsDatabaseTest {
     @Test
     fun testCalendarDateGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
-        val calendarDates = source.calendarDates.getAll()
+        val calendarDates = source.calendarDates.listAll()
 
         assertTrue(calendarDates.size == 3)
         assertNotNull(calendarDates.find { calendarDate -> calendarDate.date == "20190218"})
@@ -308,7 +310,7 @@ class GtfsDatabaseTest {
 
         source.calendarDates.insert(calendarDate)
         assertTrue(source.calendarDates.delete(calendarDate))
-        assertTrue(source.calendarDates.getByServiceId(calendarDate.serviceId).isEmpty())
+        assertTrue(source.calendarDates.listByServiceId(calendarDate.serviceId).isEmpty())
     }
 
     // StopTime tests
@@ -316,7 +318,7 @@ class GtfsDatabaseTest {
     fun testStopTimeGetByTripId() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val stopTimes = source.stopTimes.getByTripId("56994291-JAN19-301Shop-Weekday-01".asTripId()!!)
+        val stopTimes = source.stopTimes.listByTripId("56994291-JAN19-301Shop-Weekday-01".asTripId()!!)
         assertTrue(stopTimes.size == 5)
         assertNotNull(stopTimes.find { stopTime -> stopTime.stopId.value == "WR285" })
     }
@@ -325,7 +327,7 @@ class GtfsDatabaseTest {
     fun testStopTimeGetByStopId() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val stopTimes = source.stopTimes.getByStopId("CK110".asStopId()!!)
+        val stopTimes = source.stopTimes.listByStopId("CK110".asStopId()!!)
         assertTrue(stopTimes.size == 2)
         assertNotNull(stopTimes.find { stopTime -> stopTime.tripId.value == "59528499-JAN19-Reduced-Weekday-02" })
     }
@@ -334,7 +336,7 @@ class GtfsDatabaseTest {
     fun testStopTimeGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val stopTimes = source.stopTimes.getAll()
+        val stopTimes = source.stopTimes.listAll()
         assertTrue(stopTimes.size == 9)
     }
 
@@ -345,7 +347,7 @@ class GtfsDatabaseTest {
         val stopTime = StopTime(TripId("ATrip"), "1:00", "1:00", StopId("AA100"), 1, null, null, null, null, null)
         assertTrue(source.stopTimes.insert(stopTime))
         assertTrue(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
-        assertEquals(stopTime, source.stopTimes.getByTripId(stopTime.tripId)[0])
+        assertEquals(stopTime, source.stopTimes.listByTripId(stopTime.tripId)[0])
     }
 
     @Test
@@ -364,12 +366,12 @@ class GtfsDatabaseTest {
     fun testTripGetByRouteId() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val trips = source.trips.getByRouteId("91-288".asRouteId()!!)
+        val trips = source.trips.listByRouteId("91-288".asRouteId()!!)
         assertTrue(trips.size == 2)
         assertNotNull(trips.find { trip -> trip.tripId.value == "57328740-JAN19-JANDA19-Weekday-26" })
         assertNotNull(trips.find { trip -> trip.tripId.value == "57328743-JAN19-JANDA19-Weekday-26" })
 
-        val directionTrips = source.trips.getByRouteId("91-288".asRouteId()!!, 1)
+        val directionTrips = source.trips.listByRouteId("91-288".asRouteId()!!, 1)
         assertTrue(directionTrips.size == 1)
         assertNotNull(directionTrips.find { trip -> trip.tripId.value == "57328740-JAN19-JANDA19-Weekday-26" })
         assertNull(directionTrips.find { trip -> trip.tripId.value == "57328743-JAN19-JANDA19-Weekday-26" })
@@ -388,7 +390,7 @@ class GtfsDatabaseTest {
     fun testTripGetByServiceId() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val trips = source.trips.getByServiceId("JAN19-JANDA19-Weekday-26".asCalendarServiceId()!!)
+        val trips = source.trips.listByServiceId("JAN19-JANDA19-Weekday-26".asCalendarServiceId()!!)
         assertEquals(4, trips.size)
     }
 
@@ -396,7 +398,7 @@ class GtfsDatabaseTest {
     fun testTripGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val trips = source.trips.getAll()
+        val trips = source.trips.listAll()
         assertEquals(4, trips.size)
     }
 
@@ -437,7 +439,7 @@ class GtfsDatabaseTest {
     fun testShapeGetById() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val shape = source.shapes?.getById("A_shp".asShapeId()!!)
+        val shape = source.shapes?.listById("A_shp".asShapeId()!!)
         assertNotNull(shape)
         assertEquals(3, shape?.size)
     }
@@ -446,7 +448,7 @@ class GtfsDatabaseTest {
     fun testShapeGetAll() {
         val source = GtfsDatabase(postgres.testDatabase.connection)
 
-        val shape = source.shapes?.getAll()
+        val shape = source.shapes?.listAll()
         assertNotNull(shape)
         assertEquals(4, shape?.size)
     }
@@ -457,7 +459,7 @@ class GtfsDatabaseTest {
 
         val shape = Shape("Test".asShapeId()!!, 12.0, 12.0, 1, 0.0)
         assertTrue(source.shapes?.insert(shape)!!)
-        assertEquals(shape, source.shapes?.getById(shape.id)!![0])
+        assertEquals(shape, source.shapes?.listById(shape.id)!![0])
     }
 
     @Test
@@ -467,6 +469,6 @@ class GtfsDatabaseTest {
         val shape = Shape("Test".asShapeId()!!, 12.0, 12.0, 1, 0.0)
         assertTrue(source.shapes?.insert(shape)!!)
         assertTrue(source.shapes?.delete(shape)!!)
-        assertEquals(0, source.shapes?.getById(shape.id)!!.size)
+        assertEquals(0, source.shapes?.listById(shape.id)!!.size)
     }
 }

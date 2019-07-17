@@ -134,11 +134,11 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
             return stopsTable.getItemByKey(Stop.key, id)
         }
 
-        override fun getByCode(code: String): List<Stop> {
+        override fun getByCode(code: String): Sequence<Stop> {
             return stopsTable.getItemsByKey(Stop::code, code)
         }
 
-        override fun getAll(): List<Stop> {
+        override fun getAll(): Sequence<Stop> {
             return stopsTable.getAllItems()
         }
 
@@ -165,7 +165,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
             return routesTable.getItemByKey(Route.key, id)
         }
 
-        override fun getAll(): List<Route> {
+        override fun getAll(): Sequence<Route> {
             return routesTable.getAllItems()
         }
 
@@ -188,7 +188,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
             return agencyTable.getItemByKey(Agency.key, id)
         }
 
-        override fun getAll(): List<Agency> {
+        override fun getAll(): Sequence<Agency> {
             return agencyTable.getAllItems()
         }
 
@@ -211,7 +211,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
             return calendarsTable.getItemByKey(Calendar.key, serviceId)
         }
 
-        override fun getByDays(monday: Int, tuesday: Int, wednesday: Int, thursday: Int, friday: Int, saturday: Int, sunday: Int): List<Calendar> {
+        override fun getByDays(monday: Int, tuesday: Int, wednesday: Int, thursday: Int, friday: Int, saturday: Int, sunday: Int): Sequence<Calendar> {
             val map = mutableMapOf<Int, Int>()
             if (monday != -1) map[1] = monday
             if (tuesday != -1) map[2] = tuesday
@@ -243,7 +243,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
             }, map)
         }
 
-        override fun getAll(): List<Calendar> {
+        override fun getAll(): Sequence<Calendar> {
             return calendarsTable.getAllItems()
         }
 
@@ -262,15 +262,15 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
     override val calendarDates: CalendarDateDao = object : CalendarDateDao {
 
-        override fun getByServiceId(serviceId: CalendarServiceId): List<CalendarDate> {
+        override fun getByServiceId(serviceId: CalendarServiceId): Sequence<CalendarDate> {
             return calendarDatesTable.getItemsByKey(CalendarDate::serviceId, serviceId)
         }
 
-        override fun getByDate(date: String): List<CalendarDate> {
+        override fun getByDate(date: String): Sequence<CalendarDate> {
             return calendarDatesTable.getItemsByKey(CalendarDate::date, date)
         }
 
-        override fun getAll(): List<CalendarDate> {
+        override fun getAll(): Sequence<CalendarDate> {
             return calendarDatesTable.getAllItems()
         }
 
@@ -285,15 +285,15 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
     override val stopTimes: StopTimeDao = object : StopTimeDao {
 
-        override fun getByTripId(tripId: TripId): List<StopTime> {
+        override fun getByTripId(tripId: TripId): Sequence<StopTime> {
             return stopTimesTable.getItemsByKey(StopTime::tripId, tripId)
         }
 
-        override fun getByStopId(stopId: StopId): List<StopTime> {
+        override fun getByStopId(stopId: StopId): Sequence<StopTime> {
             return stopTimesTable.getItemsByKey(StopTime::stopId, stopId)
         }
 
-        override fun getAll(): List<StopTime> {
+        override fun getAll(): Sequence<StopTime> {
             return stopTimesTable.getAllItems()
         }
 
@@ -308,11 +308,11 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
 
     override val trips: TripDao = object : TripDao {
 
-        override fun getByRouteId(routeId: RouteId): List<Trip> {
+        override fun getByRouteId(routeId: RouteId): Sequence<Trip> {
             return tripsTable.getItemsByKey(Trip::routeId, routeId)
         }
 
-        override fun getByRouteId(routeId: RouteId, directionId: Int): List<Trip> {
+        override fun getByRouteId(routeId: RouteId, directionId: Int): Sequence<Trip> {
             return tripsTable.getItemsByKey({ "${it.routeId.value}//${it.directionId}" }, "${routeId.value}//$directionId")
         }
 
@@ -320,11 +320,11 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
             return tripsTable.getItemByKey(Trip.key, id)
         }
 
-        override fun getByServiceId(serviceId: CalendarServiceId): List<Trip> {
+        override fun getByServiceId(serviceId: CalendarServiceId): Sequence<Trip> {
             return tripsTable.getItemsByKey(Trip::serviceId, serviceId)
         }
 
-        override fun getAll(): List<Trip> {
+        override fun getAll(): Sequence<Trip> {
             return tripsTable.getAllItems()
         }
 
@@ -342,11 +342,11 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
     }
 
     override val shapes: ShapeDao? = object : ShapeDao {
-        override fun getById(id: ShapeId): List<Shape> {
+        override fun getById(id: ShapeId): Sequence<Shape> {
             return shapesTable!!.getItemsByKey({ it.id }, id)
         }
 
-        override fun getAll(): List<Shape> {
+        override fun getAll(): Sequence<Shape> {
             return shapesTable!!.getAllItems()
         }
 

@@ -12,23 +12,26 @@ interface TripDao : UpdatableDao<Trip> {
     /**
      * Gets a list of trips by run by a specified route based on the route's ID.
      * @see [Route.id]
+     * @see [listByRouteId]
      *
-     * @param route The route to get a list of trips for
+     * @param routeId The route to get a list of trips for
      * @return A list of [Trip]s that are run by the requested route.
      */
-    fun getByRouteId(routeId: RouteId): List<Trip>
+    fun getByRouteId(routeId: RouteId): Sequence<Trip>
 
     /**
      * Gets a list of trips by run by a specified route and in a specified direction.
+     * @see [listByRouteId]
      *
-     * @param route The route to get a list of trips for
+     * @param routeId The route to get a list of trips for
      * @param directionId The direction of the trip (0 or 1)
      * @return A list of [Trip]s that are run by the requested route.
      */
-    fun getByRouteId(routeId: RouteId, directionId: Int): List<Trip>
+    fun getByRouteId(routeId: RouteId, directionId: Int): Sequence<Trip>
 
     /**
      * Gets a trip by its id.
+     * @see [listByServiceId]
      *
      * @param id The trip's id.
      * @return The [Trip] object, null if it does not exist.
@@ -42,5 +45,11 @@ interface TripDao : UpdatableDao<Trip> {
      * @param serviceId The id of the service type. Taken from [Calendar].
      * @return A list of matching [Trip]s.
      */
-    fun getByServiceId(serviceId: CalendarServiceId): List<Trip>
+    fun getByServiceId(serviceId: CalendarServiceId): Sequence<Trip>
 }
+
+fun TripDao.listByRouteId(routeId: RouteId) = getByRouteId(routeId).toList()
+
+fun TripDao.listByRouteId(routeId: RouteId, directionId: Int) = getByRouteId(routeId, directionId).toList()
+
+fun TripDao.listByServiceId(serviceId: CalendarServiceId) = getByServiceId(serviceId).toList()

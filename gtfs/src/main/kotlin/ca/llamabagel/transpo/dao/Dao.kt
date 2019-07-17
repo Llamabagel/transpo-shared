@@ -11,13 +11,12 @@ package ca.llamabagel.transpo.dao
  * @param T The type of object being handled by this DAO.
  */
 interface Dao<T> {
-
     /**
-     * Gets a list of all available [T] from the source.
+     * Gets a [Sequence] of all available [T] from the source.
      *
-     * @return A list of all [T]
+     * @return A sequence of all [T]
      */
-    fun getAll(): List<T>
+    fun getAll(): Sequence<T>
 
     /**
      * Insert a [T] into the data source.
@@ -36,5 +35,6 @@ interface Dao<T> {
      * @return true if the given items were all deleted successfully, false if not
      */
     fun delete(vararg t: T): Boolean
-
 }
+
+fun <T> Dao<T>.listAll() = getAll().toList()

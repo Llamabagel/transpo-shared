@@ -12,19 +12,24 @@ interface CalendarDateDao : Dao<CalendarDate> {
 
     /**
      * Gets all [CalendarDate] items by their serviceId.
+     * @see [listByServiceId]
      *
      * @param serviceId The service id to search for
-     * @return List of all [CalendarDate]s with that service id
+     * @return [Sequence] of all [CalendarDate]s with that service id
      */
-    fun getByServiceId(serviceId: CalendarServiceId): List<CalendarDate>
+    fun getByServiceId(serviceId: CalendarServiceId): Sequence<CalendarDate>
 
     /**
      * Gets all [CalendarDate] items for a specified date.
      * The date should be provided in YYYYMMDD format.
+     * @see [listByDate]
      *
      * @param date The date in YYYYMMDD format.
-     * @return A list of all [CalendarDate]s on this date.
+     * @return A [Sequence] of all [CalendarDate]s on this date.
      */
-    fun getByDate(date: String): List<CalendarDate>
-
+    fun getByDate(date: String): Sequence<CalendarDate>
 }
+
+fun CalendarDateDao.listByServiceId(serviceId: CalendarServiceId) = getByServiceId(serviceId).toList()
+
+fun CalendarDateDao.listByDate(date: String) = getByDate(date).toList()

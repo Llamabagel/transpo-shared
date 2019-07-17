@@ -9,7 +9,7 @@ import ca.llamabagel.transpo.models.gtfs.Shape
 import ca.llamabagel.transpo.models.gtfs.ShapeId
 
 interface ShapeDao : Dao<Shape> {
-
-    fun getById(id: ShapeId) : List<Shape>
-
+    fun getById(id: ShapeId) : Sequence<Shape>
 }
+
+fun ShapeDao.listById(id: ShapeId) = getById(id).toList()

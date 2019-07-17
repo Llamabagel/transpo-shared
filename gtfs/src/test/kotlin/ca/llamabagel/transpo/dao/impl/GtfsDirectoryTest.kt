@@ -4,11 +4,11 @@
 
 package ca.llamabagel.transpo.dao.impl
 
+import ca.llamabagel.transpo.dao.gtfs.*
+import ca.llamabagel.transpo.dao.listAll
 import ca.llamabagel.transpo.models.gtfs.*
-import org.junit.Assert.*
 import org.apache.commons.io.FileUtils
-import org.junit.Assert
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,18 +32,18 @@ class GtfsDirectoryTest {
         val source = GtfsDirectory(testFolder.root.toPath())
 
         val stop = source.stops.getById(StopId("AF970"))
-        Assert.assertTrue(stop != null)
-        Assert.assertEquals(StopId("AF970").value, stop?.id)
-        Assert.assertEquals("3030", stop?.code)
+        assertTrue(stop != null)
+        assertEquals(StopId("AF970").value, stop?.id)
+        assertEquals("3030", stop?.code)
 
-        Assert.assertNull(source.stops.getById(StopId("SomeNonIdValue")))
+        assertNull(source.stops.getById(StopId("SomeNonIdValue")))
     }
 
     @Test
     fun testStopGetByCode() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val result = source.stops.getByCode("3031")
+        val result = source.stops.listByCode("3031")
         assertEquals(2, result.size)
         assertNotNull(result.find { stop -> stop.id == StopId("AF980") })
     }
@@ -52,7 +52,7 @@ class GtfsDirectoryTest {
     fun testStopGetAll() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val result = source.stops.getAll()
+        val result = source.stops.listAll()
         assertEquals(5, result.size)
         assertNotNull(result.find { stop -> stop.id == StopId("AF980") })
     }
@@ -119,7 +119,7 @@ class GtfsDirectoryTest {
     fun testRouteGetAll() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val routes = source.routes.getAll()
+        val routes = source.routes.listAll()
         assertTrue(routes.size == 3)
         assertNotNull(routes.find { route -> route.id == RouteId("5-288") })
     }
@@ -170,7 +170,7 @@ class GtfsDirectoryTest {
     fun testAgencyGetAll() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val agencies = source.agencies.getAll()
+        val agencies = source.agencies.listAll()
         assertTrue(agencies.size == 1)
         assertNotNull(agencies.find { agency -> agency.name == "OC Transpo" })
     }
@@ -223,25 +223,25 @@ class GtfsDirectoryTest {
     fun testCalendarGetByDays() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val weekdays = source.calendars.getByDays(monday = 1, friday = 1)
+        val weekdays = source.calendars.listByDays(monday = 1, friday = 1)
         assertTrue(weekdays.size == 2)
         assertNotNull(weekdays.find { calendar -> calendar.serviceId == CalendarServiceId("JAN19-JANDA19-Weekday-26") })
 
-        val sundays = source.calendars.getByDays(monday = 0, sunday = 1)
+        val sundays = source.calendars.listByDays(monday = 0, sunday = 1)
         assertTrue(sundays.size == 1)
         assertNotNull(sundays.find { calendar -> calendar.serviceId == CalendarServiceId("JAN19-JANSU19-Sunday-02") })
 
-        val none = source.calendars.getByDays(monday = 1, sunday = 1)
+        val none = source.calendars.listByDays(monday = 1, sunday = 1)
         assertTrue(none.isEmpty())
 
-        assertTrue(source.calendars.getByDays().isEmpty())
+        assertTrue(source.calendars.listByDays().isEmpty())
     }
 
     @Test
     fun testCalendarGetAll() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val calendars = source.calendars.getAll()
+        val calendars = source.calendars.listAll()
 
         assertTrue(calendars.size == 4)
         assertNotNull(calendars.find { calendar -> calendar.serviceId == CalendarServiceId("JAN19-JANSU19-Sunday-02") })
@@ -284,7 +284,7 @@ class GtfsDirectoryTest {
     @Test
     fun testCalendarDateGetByServiceId() {
         val source = GtfsDirectory(testFolder.root.toPath())
-        val calendarDates = source.calendarDates.getByServiceId(CalendarServiceId("JAN19-d1930LoR-Weekday-01"))
+        val calendarDates = source.calendarDates.listByServiceId(CalendarServiceId("JAN19-d1930LoR-Weekday-01"))
 
         assertTrue(calendarDates.size == 1)
         assertNotNull(calendarDates.find { calendarDate -> calendarDate.serviceId == CalendarServiceId("JAN19-d1930LoR-Weekday-01") })
@@ -293,7 +293,7 @@ class GtfsDirectoryTest {
     @Test
     fun testCalendarDateGetByDate() {
         val source = GtfsDirectory(testFolder.root.toPath())
-        val calendarDates = source.calendarDates.getByDate("20190218")
+        val calendarDates = source.calendarDates.listByDate("20190218")
 
         assertTrue(calendarDates.size == 1)
         assertNotNull(calendarDates.find { calendarDate -> calendarDate.date == "20190218"})
@@ -302,7 +302,7 @@ class GtfsDirectoryTest {
     @Test
     fun testCalendarDateGetAll() {
         val source = GtfsDirectory(testFolder.root.toPath())
-        val calendarDates = source.calendarDates.getAll()
+        val calendarDates = source.calendarDates.listAll()
 
         assertTrue(calendarDates.size == 3)
         assertNotNull(calendarDates.find { calendarDate -> calendarDate.date == "20190218"})
@@ -324,7 +324,7 @@ class GtfsDirectoryTest {
 
         source.calendarDates.insert(calendarDate)
         assertTrue(source.calendarDates.delete(calendarDate))
-        assertTrue(source.calendarDates.getByServiceId(calendarDate.serviceId).isEmpty())
+        assertTrue(source.calendarDates.listByServiceId(calendarDate.serviceId).isEmpty())
     }
 
     // StopTime tests
@@ -332,7 +332,7 @@ class GtfsDirectoryTest {
     fun testStopTimeGetByTripId() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val stopTimes = source.stopTimes.getByTripId("56994291-JAN19-301Shop-Weekday-01".asTripId()!!)
+        val stopTimes = source.stopTimes.listByTripId("56994291-JAN19-301Shop-Weekday-01".asTripId()!!)
         assertTrue(stopTimes.size == 5)
         assertNotNull(stopTimes.find { stopTime -> stopTime.stopId.value == "WR285" })
     }
@@ -341,7 +341,7 @@ class GtfsDirectoryTest {
     fun testStopTimeGetByStopId() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val stopTimes = source.stopTimes.getByStopId("CK110".asStopId()!!)
+        val stopTimes = source.stopTimes.listByStopId("CK110".asStopId()!!)
         assertTrue(stopTimes.size == 2)
         assertNotNull(stopTimes.find { stopTime -> stopTime.tripId.value == "59528499-JAN19-Reduced-Weekday-02" })
     }
@@ -350,7 +350,7 @@ class GtfsDirectoryTest {
     fun testStopTimeGetAll() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val stopTimes = source.stopTimes.getAll()
+        val stopTimes = source.stopTimes.listAll()
         assertTrue(stopTimes.size == 9)
     }
 
@@ -361,7 +361,7 @@ class GtfsDirectoryTest {
         val stopTime = StopTime(TripId("ATrip"), "1:00", "1:00", StopId("AA100"), 1, null, null, null, null, null)
         assertTrue(source.stopTimes.insert(stopTime))
         assertTrue(source.stopTimes.getByTripId(stopTime.tripId).contains(stopTime))
-        assertEquals(stopTime, source.stopTimes.getByTripId(stopTime.tripId)[0])
+        assertEquals(stopTime, source.stopTimes.listByTripId(stopTime.tripId)[0])
     }
 
     @Test
@@ -380,12 +380,12 @@ class GtfsDirectoryTest {
     fun testTripGetByRouteId() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val trips = source.trips.getByRouteId("91-288".asRouteId()!!)
+        val trips = source.trips.listByRouteId("91-288".asRouteId()!!)
         assertTrue(trips.size == 2)
         assertNotNull(trips.find { trip -> trip.tripId.value == "57328740-JAN19-JANDA19-Weekday-26" })
         assertNotNull(trips.find { trip -> trip.tripId.value == "57328743-JAN19-JANDA19-Weekday-26" })
 
-        val directionTrips = source.trips.getByRouteId("91-288".asRouteId()!!, 1)
+        val directionTrips = source.trips.listByRouteId("91-288".asRouteId()!!, 1)
         assertTrue(directionTrips.size == 1)
         assertNotNull(directionTrips.find { trip -> trip.tripId.value == "57328740-JAN19-JANDA19-Weekday-26" })
         assertNull(directionTrips.find { trip -> trip.tripId.value == "57328743-JAN19-JANDA19-Weekday-26" })
@@ -404,7 +404,7 @@ class GtfsDirectoryTest {
     fun testTripGetByServiceId() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val trips = source.trips.getByServiceId("JAN19-JANDA19-Weekday-26".asCalendarServiceId()!!)
+        val trips = source.trips.listByServiceId("JAN19-JANDA19-Weekday-26".asCalendarServiceId()!!)
         assertEquals(4, trips.size)
     }
 
@@ -412,7 +412,7 @@ class GtfsDirectoryTest {
     fun testTripGetAll() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val trips = source.trips.getAll()
+        val trips = source.trips.listAll()
         assertEquals(4, trips.size)
     }
 
@@ -453,7 +453,7 @@ class GtfsDirectoryTest {
     fun testShapeGetById() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val shape = source.shapes?.getById("A_shp".asShapeId()!!)
+        val shape = source.shapes?.listById("A_shp".asShapeId()!!)
         assertNotNull(shape)
         assertEquals(3, shape?.size)
     }
@@ -462,7 +462,7 @@ class GtfsDirectoryTest {
     fun testShapeGetAll() {
         val source = GtfsDirectory(testFolder.root.toPath())
 
-        val shape = source.shapes?.getAll()
+        val shape = source.shapes?.listAll()
         assertNotNull(shape)
         assertEquals(4, shape?.size)
     }
@@ -473,7 +473,7 @@ class GtfsDirectoryTest {
 
         val shape = Shape("Test".asShapeId()!!, 12.0, 12.0, 1, 0.0)
         assertTrue(source.shapes?.insert(shape)!!)
-        assertEquals(shape, source.shapes?.getById(shape.id)!![0])
+        assertEquals(shape, source.shapes?.listById(shape.id)!![0])
     }
 
     @Test
@@ -483,7 +483,7 @@ class GtfsDirectoryTest {
         val shape = Shape("Test".asShapeId()!!, 12.0, 12.0, 1, 0.0)
         assertTrue(source.shapes?.insert(shape)!!)
         assertTrue(source.shapes?.delete(shape)!!)
-        assertEquals(0, source.shapes?.getById(shape.id)!!.size)
+        assertEquals(0, source.shapes?.listById(shape.id)!!.size)
     }
 
 }

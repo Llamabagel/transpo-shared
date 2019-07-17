@@ -33,29 +33,22 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getByCode(code: String): List<Stop> {
+        override fun getByCode(code: String): Sequence<Stop> {
             val result = connection.prepareStatement("SELECT * FROM stops WHERE code = ?")
                     .apply {
                         setString(1, code)
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence {
-                    if (it.next()) getStopFromResultSet(it) else null
-                }.toList()
-            }
+            return generateSequence { if (result.next()) getStopFromResultSet(result) else null }
         }
 
-        override fun getAll(): List<Stop> {
+        override fun getAll(): Sequence<Stop> {
             val result = connection.createStatement()
                     .executeQuery("SELECT * FROM stops")
 
-            return result.use {
-                generateSequence {
-                    if (it.next()) getStopFromResultSet(it) else null
-                }.toList()
-            }
+            return generateSequence { if (result.next()) getStopFromResultSet(result) else null }
+
         }
 
         override fun insert(vararg t: Stop): Boolean {
@@ -169,12 +162,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getAll(): List<Route> {
+        override fun getAll(): Sequence<Route> {
             val result = connection.prepareStatement("SELECT * FROM routes").executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getRouteFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getRouteFromResultSet(result) else null }
         }
 
         override fun insert(vararg t: Route): Boolean {
@@ -260,12 +251,10 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getAll(): List<Agency> {
+        override fun getAll(): Sequence<Agency> {
             val result = connection.prepareStatement("SELECT * FROM agencies").executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getAgencyFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getAgencyFromResultSet(result) else null }
         }
 
         override fun insert(vararg t: Agency): Boolean {
@@ -340,9 +329,9 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getByDays(monday: Int, tuesday: Int, wednesday: Int, thursday: Int, friday: Int, saturday: Int, sunday: Int): List<Calendar> {
+        override fun getByDays(monday: Int, tuesday: Int, wednesday: Int, thursday: Int, friday: Int, saturday: Int, sunday: Int): Sequence<Calendar> {
             if (monday == -1 && tuesday == -1 && wednesday == -1 && thursday == -1 && friday == -1 && saturday == -1 && sunday == -1) {
-                return emptyList()
+                return emptySequence()
             }
 
             // Concatenation to avoid sql syntax check in this case
@@ -369,19 +358,13 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence {
-                    if (it.next()) getCalendarFromResultSet(it) else null
-                }.toList()
-            }
+            return generateSequence { if (result.next()) getCalendarFromResultSet(result) else null }
         }
 
-        override fun getAll(): List<Calendar> {
+        override fun getAll(): Sequence<Calendar> {
             val result = connection.prepareStatement("SELECT * FROM calendars").executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getCalendarFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getCalendarFromResultSet(result) else null }
         }
 
         override fun insert(vararg t: Calendar): Boolean {
@@ -452,37 +435,31 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
     }
 
     override val calendarDates: CalendarDateDao = object : CalendarDateDao {
-        override fun getByServiceId(serviceId: CalendarServiceId): List<CalendarDate> {
+        override fun getByServiceId(serviceId: CalendarServiceId): Sequence<CalendarDate> {
             val result = connection.prepareStatement("SELECT * FROM calendar_dates WHERE service_id = ?")
                     .apply {
                         setString(1, serviceId.value)
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getCalendarDateFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getCalendarDateFromResultSet(result) else null }
         }
 
-        override fun getByDate(date: String): List<CalendarDate> {
+        override fun getByDate(date: String): Sequence<CalendarDate> {
             val result = connection.prepareStatement("SELECT * FROM calendar_dates WHERE date = ?")
                     .apply {
                         setString(1, date)
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getCalendarDateFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getCalendarDateFromResultSet(result) else null }
         }
 
-        override fun getAll(): List<CalendarDate> {
+        override fun getAll(): Sequence<CalendarDate> {
             val result = connection.prepareStatement("SELECT * FROM calendar_dates")
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getCalendarDateFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getCalendarDateFromResultSet(result) else null }
         }
 
         override fun insert(vararg t: CalendarDate): Boolean {
@@ -518,37 +495,31 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
     }
 
     override val stopTimes: StopTimeDao = object : StopTimeDao {
-        override fun getByTripId(tripId: TripId): List<StopTime> {
+        override fun getByTripId(tripId: TripId): Sequence<StopTime> {
             val result = connection.prepareStatement("SELECT * FROM stop_times WHERE trip_id = ?")
                     .apply {
                         setString(1, tripId.value)
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getStopTimeFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getStopTimeFromResultSet(result) else null }
         }
 
-        override fun getByStopId(stopId: StopId): List<StopTime> {
+        override fun getByStopId(stopId: StopId): Sequence<StopTime> {
             val result = connection.prepareStatement("SELECT * FROM stop_times WHERE stop_id = ?")
                     .apply {
                         setString(1, stopId.value)
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getStopTimeFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getStopTimeFromResultSet(result) else null }
         }
 
-        override fun getAll(): List<StopTime> {
+        override fun getAll(): Sequence<StopTime> {
             val result = connection.prepareStatement("SELECT * FROM stop_times")
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getStopTimeFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getStopTimeFromResultSet(result) else null }
         }
 
         override fun insert(vararg t: StopTime): Boolean {
@@ -613,19 +584,17 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
     }
 
     override val trips: TripDao = object : TripDao {
-        override fun getByRouteId(routeId: RouteId): List<Trip> {
+        override fun getByRouteId(routeId: RouteId): Sequence<Trip> {
             val result = connection.prepareStatement("SELECT * FROM trips WHERE route_id = ?")
                     .apply {
                         setString(1, routeId.value)
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getTripFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getTripFromResultSet(result) else null }
         }
 
-        override fun getByRouteId(routeId: RouteId, directionId: Int): List<Trip> {
+        override fun getByRouteId(routeId: RouteId, directionId: Int): Sequence<Trip> {
             val result = connection.prepareStatement("SELECT * FROM trips WHERE route_id = ? AND direction_id = ?")
                     .apply {
                         setString(1, routeId.value)
@@ -633,9 +602,7 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getTripFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getTripFromResultSet(result) else null }
         }
 
         override fun getByTripId(id: TripId): Trip? {
@@ -650,25 +617,21 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
             }
         }
 
-        override fun getByServiceId(serviceId: CalendarServiceId): List<Trip> {
+        override fun getByServiceId(serviceId: CalendarServiceId): Sequence<Trip> {
             val result = connection.prepareStatement("SELECT * FROM trips WHERE service_id = ?")
                     .apply {
                         setString(1, serviceId.value)
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getTripFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getTripFromResultSet(result) else null }
         }
 
-        override fun getAll(): List<Trip> {
+        override fun getAll(): Sequence<Trip> {
             val result = connection.prepareStatement("SELECT * FROM trips")
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getTripFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getTripFromResultSet(result) else null }
         }
 
         override fun insert(vararg t: Trip): Boolean {
@@ -752,25 +715,21 @@ class GtfsDatabase(private val connection: Connection) : GtfsSource() {
     }
 
     override val shapes: ShapeDao? = object : ShapeDao {
-        override fun getById(id: ShapeId): List<Shape> {
+        override fun getById(id: ShapeId): Sequence<Shape> {
             val result = connection.prepareStatement("SELECT * FROM shapes WHERE id = ?")
                     .apply {
                         setString(1, id.value)
                     }
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getShapeFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getShapeFromResultSet(result) else null }
         }
 
-        override fun getAll(): List<Shape> {
+        override fun getAll(): Sequence<Shape> {
             val result = connection.prepareStatement("SELECT * FROM shapes")
                     .executeQuery()
 
-            return result.use {
-                generateSequence { if (it.next()) getShapeFromResultSet(it) else null }.toList()
-            }
+            return generateSequence { if (result.next()) getShapeFromResultSet(result) else null }
         }
 
         override fun insert(vararg t: Shape): Boolean {

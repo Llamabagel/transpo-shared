@@ -8,6 +8,7 @@ import ca.llamabagel.transpo.models.gtfs.GtfsObject
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import kotlin.streams.asSequence
 import kotlin.streams.toList
 
 class CsvTable<T : GtfsObject>(private val path: Path,
@@ -30,7 +31,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         }
 
         Files.write(path, "\n".toByteArray(), StandardOpenOption.APPEND)
-        lines.forEach {line ->
+        lines.forEach { line ->
             Files.write(path, line.toByteArray(), StandardOpenOption.APPEND)
         }
 
@@ -70,15 +71,15 @@ class CsvTable<T : GtfsObject>(private val path: Path,
 
         val updatedLines = Files.lines(path).use { stream ->
             stream.skip(1)
-                    .map {
-                        if (it.isBlank()) return@map null
+                    .asSequence()
+                    .mapNotNull {
+                        if (it.isBlank()) return@mapNotNull null
                         val csv = objectInitializer(splitRow(it))
 
                         val csvKey = key(csv)
                         // If the object needs to be deleted, map this line to a blank value. Remove this stop from the stops map.
                         if (mapped.containsKey(key(csv))) null.also { mapped.remove(csvKey) } else it
                     }
-                    .filter { it != null }
                     .toList()
         }
 
@@ -92,39 +93,33 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         return false
     }
 
-    fun <R> getItemByKey(keyFunction: KeyFunction<T, R>, key: R): T? {
-        return Files.lines(path).use { stream ->
-            var item: T? = null
+    fun <R> getItemByKey(keyFunction: KeyFunction<T, R>, key: R): T? = Files.lines(path).let { stream ->
+        var item: T? = null
 
-            stream.skip(1).forEach {
-                if (it.isBlank()) return@forEach
-                val csv = objectInitializer(splitRow(it))
-                if (keyFunction(csv) == key) {
-                    item = csv
-                    return@forEach
-                }
+        stream.skip(1).forEach {
+            if (it.isBlank()) return@forEach
+            val csv = objectInitializer(splitRow(it))
+            if (keyFunction(csv) == key) {
+                item = csv
+                return@forEach
             }
-
-            return@use item
         }
+
+        return@let item
     }
 
-    fun <R> getItemsByKey(keyFunction: KeyFunction<T, R>, key: R): List<T> {
-        return Files.lines(path).use { stream ->
-            stream.skip(1)
-                    .filter { if (it.isNotBlank()) keyFunction(objectInitializer(splitRow(it))) == key else false }
-                    .map { objectInitializer(splitRow(it)) }
-                    .toList()
-        }
+    fun <R> getItemsByKey(keyFunction: KeyFunction<T, R>, key: R): Sequence<T> = Files.lines(path).let { stream ->
+        stream.skip(1)
+                .asSequence()
+                .filter { if (it.isNotBlank()) keyFunction(objectInitializer(splitRow(it))) == key else false }
+                .map { objectInitializer(splitRow(it)) }
     }
 
-    fun getAllItems(): List<T> {
-        return Files.lines(path).use { stream ->
-            stream.skip(1)
-                    .filter { it.isNotBlank() }
-                    .map { objectInitializer(splitRow(it)) }
-                    .toList()
-        }
+    fun getAllItems(): Sequence<T> = Files.lines(path).let { stream ->
+        stream.skip(1)
+                .asSequence()
+                .filter { it.isNotBlank() }
+                .map { objectInitializer(splitRow(it)) }
     }
 
     private fun splitRow(row: String): List<String> {
