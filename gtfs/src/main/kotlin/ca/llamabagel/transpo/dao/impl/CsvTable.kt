@@ -31,9 +31,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
         }
 
         Files.write(path, "\n".toByteArray(), StandardOpenOption.APPEND)
-        lines.forEach { line ->
-            Files.write(path, line.toByteArray(), StandardOpenOption.APPEND)
-        }
+        Files.write(path, lines.joinToString(separator = "\n").toByteArray(), StandardOpenOption.APPEND)
 
         return true
     }
