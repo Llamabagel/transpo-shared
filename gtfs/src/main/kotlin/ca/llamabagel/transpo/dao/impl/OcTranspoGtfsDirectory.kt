@@ -32,10 +32,10 @@ class OcTranspoGtfsDirectory(gtfsPath: Path) : GtfsDirectory(gtfsPath) {
 
     override val routesTable = csvTable<Route> {
         path = this@OcTranspoGtfsDirectory.path.resolve("routes.txt")
-        headers = listOf("route_id", "route_short_name", "route_long_name", "route_desc", "route_type", "route_url")
+        headers = listOf("route_id", "route_short_name", "route_long_name", "route_desc", "route_type", "route_url", "route_color", "route_text_color")
 
         objectInitializer {
-            Route(it[0].asRouteId()!!, null, it[1]!!, it[2]!!, it[3].nullIfBlank(), it[4]!!.toInt(), it[5].nullIfBlank(), null, null, null)
+            Route(it[0].asRouteId()!!, null, it[1]!!, it[2]!!, it[3].nullIfBlank(), it[4]!!.toInt(), it[5].nullIfBlank(), it[6].nullIfBlank(), it[7].nullIfBlank(), null)
         }
 
         partsInitializer {
@@ -71,10 +71,10 @@ class OcTranspoGtfsDirectory(gtfsPath: Path) : GtfsDirectory(gtfsPath) {
 
     override val tripsTable = csvTable<Trip> {
         path = this@OcTranspoGtfsDirectory.path.resolve("trips.txt")
-        headers = listOf("route_id", "service_id", "trip_id", "trip_headsign", "direction_id", "block_id")
+        headers = listOf("route_id", "service_id", "trip_id", "trip_headsign", "direction_id", "block_id", "shape_id")
 
         objectInitializer {
-            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), null, it[4]?.toIntOrNull(), it[5].nullIfBlank(), null, null, null)
+            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), null, it[4]?.toIntOrNull(), it[5].nullIfBlank(), it[6]?.asShapeId(), null, null)
         }
 
         partsInitializer {
@@ -82,6 +82,17 @@ class OcTranspoGtfsDirectory(gtfsPath: Path) : GtfsDirectory(gtfsPath) {
         }
     }
 
-    override val shapesTable: CsvTable<Shape>? = null
+    override val shapesTable: CsvTable<Shape>? = csvTable<Shape> {
+        path = this@OcTranspoGtfsDirectory.path.resolve("shapes.txt")
+        headers = listOf("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence")
+
+        objectInitializer {
+            Shape(it[0].asShapeId()!!, it[1]!!.toDouble(), it[2]!!.toDouble(), it[3]!!.toInt(), null)
+        }
+
+        partsInitializer {
+            listOf(it.id.value, it.latitude.toString(), it.longitude.toString(), it.sequence.toString())
+        }
+    }
     override val shapes: ShapeDao? = null
 }
