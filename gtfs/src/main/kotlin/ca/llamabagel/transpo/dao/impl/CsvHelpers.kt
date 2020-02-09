@@ -29,6 +29,9 @@ val StopTime.Companion.key: KeyFunction<StopTime, String>
 val Trip.Companion.key: KeyFunction<Trip, TripId>
     get() = Trip::tripId
 
+val Shape.Companion.key: KeyFunction<Shape, ShapeId>
+    get() = Shape::id
+
 /**
  * For parsing csv, if a value is empty it is considered null. This function will return null if the string
  * is null or empty. Otherwise, it just returns itself.

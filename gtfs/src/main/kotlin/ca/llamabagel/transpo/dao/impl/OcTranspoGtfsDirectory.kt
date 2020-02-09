@@ -82,7 +82,7 @@ class OcTranspoGtfsDirectory(gtfsPath: Path) : GtfsDirectory(gtfsPath) {
         }
     }
 
-    override val shapesTable: CsvTable<Shape>? = csvTable<Shape> {
+    override val shapesTable: CsvTable<Shape> = csvTable<Shape> {
         path = this@OcTranspoGtfsDirectory.path.resolve("shapes.txt")
         headers = listOf("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence")
 
@@ -94,5 +94,20 @@ class OcTranspoGtfsDirectory(gtfsPath: Path) : GtfsDirectory(gtfsPath) {
             listOf(it.id.value, it.latitude.toString(), it.longitude.toString(), it.sequence.toString())
         }
     }
-    override val shapes: ShapeDao? = null
+
+    override val shapes: ShapeDao = object : ShapeDao {
+        override fun getById(id: ShapeId): Sequence<Shape> = shapesTable.getItemsByKey(Shape.key, id)
+
+        override fun getAll(): Sequence<Shape> = shapesTable.getAllItems()
+
+        override fun insert(vararg t: Shape): Boolean {
+            return shapesTable.insertCsvRows({ "${it.id.value}//${it.sequence}" }, {
+                shapesTable.getItemByKey({ "${it.id.value}//${it.sequence}" }, it)
+            }, *t)
+        }
+
+        override fun delete(vararg t: Shape): Boolean {
+            return shapesTable.deleteCsvRows({ "${it.id.value}//${it.sequence}" }, *t)
+        }
+    }
 }
