@@ -4,9 +4,9 @@
 
 package ca.llamabagel.transpo.models.updates
 
-import ca.llamabagel.transpo.utils.DateSerializer
+import ca.llamabagel.transpo.utils.OffsetDateTimeSerializer
 import kotlinx.serialization.Serializable
-import java.util.*
+import java.time.OffsetDateTime
 
 /**
  * Live Update entry model
@@ -22,7 +22,7 @@ import java.util.*
  */
 @Serializable
 data class LiveUpdate(val title: String,
-                      @Serializable(with = DateSerializer::class) val date: Date,
+                      @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime,
                       val category: String,
                       val link: String,
                       val description: String,

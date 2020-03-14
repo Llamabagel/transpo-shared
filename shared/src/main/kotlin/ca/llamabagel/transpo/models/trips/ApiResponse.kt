@@ -4,9 +4,9 @@
 
 package ca.llamabagel.transpo.models.trips
 
-import ca.llamabagel.transpo.utils.DateSerializer
+import ca.llamabagel.transpo.utils.OffsetDateTimeSerializer
 import kotlinx.serialization.Serializable
-import java.util.*
+import java.time.OffsetDateTime
 
 /**
  * API response from the Route 613 API computed from the response of an OC Transpo API request.
@@ -20,4 +20,4 @@ import java.util.*
 data class ApiResponse(val stopCode: String,
                        val routes: List<Route>,
                        val inactiveRoutes: List<Route> = emptyList(),
-                       @Serializable(with = DateSerializer::class) val responseTime: Date = Date())
+                       @Serializable(with = OffsetDateTimeSerializer::class) val responseTime: OffsetDateTime = OffsetDateTime.now())

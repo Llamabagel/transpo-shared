@@ -107,7 +107,7 @@ open class GtfsDirectory(val path: Path) : GtfsSource() {
         headers = listOf("route_id", "service_id", "trip_id", "trip_headsign", "short_name", "direction_id", "block_id", "shape_id", "wheelchair_accessible", "bikes_allowed")
 
         objectInitializer {
-            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), it[4].nullIfBlank(), it[5]?.toIntOrNull(), it[6].nullIfBlank(), it[7].nullIfBlank().asShapeId(), it[8]?.toIntOrNull(), it[9]?.toIntOrNull())
+            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), it[4].nullIfBlank(), it[5]?.toIntOrNull(), it[6].nullIfBlank(), it[7].nullIfBlank()?.asShapeId(), it[8]?.toIntOrNull(), it[9]?.toIntOrNull())
         }
 
         partsInitializer {

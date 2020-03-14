@@ -8,9 +8,9 @@ import ca.llamabagel.transpo.models.transit.Route
 import ca.llamabagel.transpo.models.transit.RouteShape
 import ca.llamabagel.transpo.models.transit.Stop
 import ca.llamabagel.transpo.models.transit.StopRoute
-import ca.llamabagel.transpo.utils.DateSerializer
+import ca.llamabagel.transpo.utils.OffsetDateTimeSerializer
 import kotlinx.serialization.Serializable
-import java.util.*
+import java.time.OffsetDateTime
 
 /**
  * The full package of transit data that is sent by the server when the client downloads a data set.
@@ -25,7 +25,7 @@ import java.util.*
 @Serializable
 data class DataPackage(val dataVersion: String,
                        val schemaVersion: Int,
-                       @Serializable(with = DateSerializer::class) val date: Date,
+                       @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime,
                        val data: Data)
 
 /**

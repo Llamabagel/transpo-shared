@@ -30,7 +30,7 @@ class CsvTable<T : GtfsObject>(private val path: Path,
             partsInitializer(it).toCsv()
         }
 
-        Files.write(path, lines, StandardOpenOption.APPEND)
+        Files.write(path, listOf(System.lineSeparator()) + lines, StandardOpenOption.APPEND)
 
         return true
     }

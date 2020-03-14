@@ -4,9 +4,9 @@
 
 package ca.llamabagel.transpo.models.app
 
-import ca.llamabagel.transpo.utils.DateSerializer
+import ca.llamabagel.transpo.utils.OffsetDateTimeSerializer
 import kotlinx.serialization.Serializable
-import java.util.*
+import java.time.OffsetDateTime
 
 /**
  * Data class representing metadata about the 'app' as a whole. Specifically, this is the class used by the server
@@ -28,4 +28,4 @@ import java.util.*
 data class AppMetadata(val dataVersion: String,
                        val dataSchemaVersion: Int,
                        val latestAppVersion: String,
-                       @Serializable(with = DateSerializer::class) val date: Date = Date())
+                       @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime = OffsetDateTime.now())

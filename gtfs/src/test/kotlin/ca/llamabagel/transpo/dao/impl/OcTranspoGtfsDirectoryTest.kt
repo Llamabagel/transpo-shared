@@ -111,9 +111,9 @@ class OcTranspoGtfsDirectoryTest {
     fun testRouteGetById() {
         val source = OcTranspoGtfsDirectory(testFolder.root.toPath())
 
-        val route = source.routes.getById(RouteId("5-288"))
+        val route = source.routes.getById(RouteId("5-313"))
         assertNotNull(route)
-        assertTrue(route?.id == RouteId("5-288"))
+        assertTrue(route?.id == RouteId("5-313"))
     }
 
     @Test
@@ -121,8 +121,8 @@ class OcTranspoGtfsDirectoryTest {
         val source = OcTranspoGtfsDirectory(testFolder.root.toPath())
 
         val routes = source.routes.listAll()
-        assertEquals(183, routes.size)
-        assertNotNull(routes.find { route -> route.id == RouteId("5-288") })
+        assertEquals(185, routes.size)
+        assertNotNull(routes.find { route -> route.id == RouteId("5-313") })
     }
 
     @Test
@@ -254,7 +254,7 @@ class OcTranspoGtfsDirectoryTest {
         val calendarDates = source.calendarDates.listByDate("20190218")
 
         assertTrue(calendarDates.size == 1)
-        assertNotNull(calendarDates.find { calendarDate -> calendarDate.date == "20190218"})
+        assertNotNull(calendarDates.find { calendarDate -> calendarDate.date == "20190218" })
     }
 
     @Test
@@ -263,7 +263,7 @@ class OcTranspoGtfsDirectoryTest {
         val calendarDates = source.calendarDates.listAll()
 
         assertEquals(27, calendarDates.size)
-        assertNotNull(calendarDates.find { calendarDate -> calendarDate.date == "20190218"})
+        assertNotNull(calendarDates.find { calendarDate -> calendarDate.date == "20190218" })
     }
 
     @Test
@@ -338,27 +338,27 @@ class OcTranspoGtfsDirectoryTest {
     fun testTripGetByRouteId() {
         val source = OcTranspoGtfsDirectory(testFolder.root.toPath())
 
-        val trips = source.trips.listByRouteId("301-288".asRouteId()!!)
+        val trips = source.trips.listByRouteId("88-313".asRouteId()!!)
         assertTrue(trips.size == 2)
-        assertNotNull(trips.find { trip -> trip.tripId.value == "56994291-JAN19-301Shop-Weekday-01" })
-        assertNotNull(trips.find { trip -> trip.tripId.value == "56994293-JAN19-301Shop-Weekday-01" })
+        assertNotNull(trips.find { trip -> trip.tripId.value == "69150303-JAN20-JANDA20-Weekday-10" })
+        assertNotNull(trips.find { trip -> trip.tripId.value == "69150307-JAN20-JANDA20-Weekday-10" })
     }
 
     @Test
     fun testTripGetByTripId() {
         val source = OcTranspoGtfsDirectory(testFolder.root.toPath())
 
-        val trip = source.trips.getByTripId("56994291-JAN19-301Shop-Weekday-01".asTripId()!!)
+        val trip = source.trips.getByTripId("69150307-JAN20-JANDA20-Weekday-10".asTripId()!!)
         assertNotNull(trip)
-        assertTrue(trip?.tripId?.value == "56994291-JAN19-301Shop-Weekday-01")
+        assertTrue(trip?.tripId?.value == "69150307-JAN20-JANDA20-Weekday-10")
     }
 
     @Test
     fun testTripGetByServiceId() {
         val source = OcTranspoGtfsDirectory(testFolder.root.toPath())
 
-        val trips = source.trips.listByServiceId("JAN19-301Shop-Weekday-01".asCalendarServiceId()!!)
-        assertEquals(2, trips.size)
+        val trips = source.trips.listByServiceId("JAN20-JANDA20-Weekday-10".asCalendarServiceId()!!)
+        assertEquals(7, trips.size)
     }
 
     @Test
@@ -366,7 +366,7 @@ class OcTranspoGtfsDirectoryTest {
         val source = OcTranspoGtfsDirectory(testFolder.root.toPath())
 
         val trips = source.trips.listAll()
-        assertEquals(10, trips.size)
+        assertEquals(7, trips.size)
     }
 
     @Test
@@ -375,7 +375,7 @@ class OcTranspoGtfsDirectoryTest {
 
         val trip = Trip(RouteId("1-1"), CalendarServiceId("TestService"), TripId("Trip1"), "Forward", null, 0, null, null, null, null)
         assertTrue(source.trips.insert(trip))
-        assertEquals(source.trips.getByTripId(trip.tripId), trip)
+        assertEquals(trip, source.trips.getByTripId(trip.tripId))
     }
 
     @Test
@@ -385,7 +385,7 @@ class OcTranspoGtfsDirectoryTest {
         val trip = Trip(RouteId("1-1"), CalendarServiceId("TestService"), TripId("Trip1"), "Forward", null, 0, null, null, null, null)
         source.trips.insert(trip)
 
-        val newTrip = Trip(trip.routeId, trip.serviceId, trip.tripId, "Backward",  null, 1, "1", null, null, null)
+        val newTrip = Trip(trip.routeId, trip.serviceId, trip.tripId, "Backward", null, 1, "1", null, null, null)
         assertTrue(source.trips.update(newTrip))
         assertNotEquals(trip, source.trips.getByTripId(trip.tripId))
         assertEquals(newTrip, source.trips.getByTripId(trip.tripId))
@@ -402,11 +402,14 @@ class OcTranspoGtfsDirectoryTest {
         assertNull(source.trips.getByTripId(trip.tripId))
     }
 
-    
+
     @Test
     fun testShapes() {
         val source = OcTranspoGtfsDirectory(testFolder.root.toPath())
-        assertNull(source.shapes)
+
+        val shapes = source.shapes.getById(ShapeId("10638")).toList()
+
+        assertEquals(406, shapes.size)
     }
 
 }

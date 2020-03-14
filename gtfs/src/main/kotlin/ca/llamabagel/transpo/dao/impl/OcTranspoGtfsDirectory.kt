@@ -39,7 +39,7 @@ class OcTranspoGtfsDirectory(gtfsPath: Path) : GtfsDirectory(gtfsPath) {
         }
 
         partsInitializer {
-            listOf(it.id.value, it.shortName, it.longName, it.description, it.type.toString(), it.url)
+            listOf(it.id.value, it.shortName, it.longName, it.description, it.type.toString(), it.url, it.color, it.textColor)
         }
     }
 
@@ -74,7 +74,7 @@ class OcTranspoGtfsDirectory(gtfsPath: Path) : GtfsDirectory(gtfsPath) {
         headers = listOf("route_id", "service_id", "trip_id", "trip_headsign", "direction_id", "block_id", "shape_id")
 
         objectInitializer {
-            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), null, it[4]?.toIntOrNull(), it[5].nullIfBlank(), it[6]?.asShapeId(), null, null)
+            Trip(it[0].asRouteId()!!, it[1].asCalendarServiceId()!!, it[2].asTripId()!!, it[3].nullIfBlank(), null, it[4]?.toIntOrNull(), it[5].nullIfBlank(), it[6].nullIfBlank()?.asShapeId(), null, null)
         }
 
         partsInitializer {
