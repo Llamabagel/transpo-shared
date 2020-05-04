@@ -18,7 +18,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'ca.llamabagel.transpo'
             artifactId 'gtfs'
-            version 'git describe --tag'.execute().text.trim()
+            version version_name
 
             from components.java
 
@@ -46,7 +46,7 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/dellisd/transpo-shared.git'
         version {
-            name = 'git describe --tag'.execute().text.trim()
+            name = version_name
         }
     }
 }
