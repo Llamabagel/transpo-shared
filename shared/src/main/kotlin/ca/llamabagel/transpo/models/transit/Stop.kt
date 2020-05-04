@@ -20,13 +20,15 @@ import kotlinx.serialization.Serializable
  * This references another stop's id.
  */
 @Serializable
-data class Stop(val id: String,
-                val code: String,
-                val name: String,
-                val latitude: Double,
-                val longitude: Double,
-                val locationType: Int,
-                val parentStation: String?) {
+data class Stop(
+        val id: String,
+        val code: String,
+        val name: String,
+        val latitude: Double,
+        val longitude: Double,
+        val locationType: Int,
+        val parentStation: String?
+) {
 
     fun getLocation(): LatLng = LatLng(latitude, longitude)
 }

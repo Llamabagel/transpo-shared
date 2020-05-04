@@ -7,7 +7,9 @@ package ca.llamabagel.transpo.models.app
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MetadataRequest(val currentDataVersion: String,
-                           val supportedSchemaVersion: Int,
-                           val currentAppCode: Int,
-                           val platform: String)
+data class MetadataRequest(
+        val currentDataVersion: String,
+        val supportedSchemaVersion: Int,
+        val currentAppCode: Int,
+        val platform: String
+)

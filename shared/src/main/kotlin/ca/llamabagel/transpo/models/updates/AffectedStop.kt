@@ -13,5 +13,7 @@ import kotlinx.serialization.Serializable
  * @property alternateService The 4-digit code of the stop where alternate service will be provided, if any
  */
 @Serializable
-data class AffectedStop(val stop: String,
-                        val alternateService: String? = null)
+data class AffectedStop(
+        val stop: String,
+        val alternateService: String? = null
+)

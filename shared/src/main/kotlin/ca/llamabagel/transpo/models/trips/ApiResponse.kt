@@ -17,7 +17,9 @@ import java.time.OffsetDateTime
  * @property responseTime The time at which this response was generated in Unix time.
  */
 @Serializable
-data class ApiResponse(val stopCode: String,
-                       val routes: List<Route>,
-                       val inactiveRoutes: List<Route> = emptyList(),
-                       @Serializable(with = OffsetDateTimeSerializer::class) val responseTime: OffsetDateTime = OffsetDateTime.now())
+data class ApiResponse(
+        val stopCode: String,
+        val routes: List<Route>,
+        val inactiveRoutes: List<Route> = emptyList(),
+        @Serializable(with = OffsetDateTimeSerializer::class) val responseTime: OffsetDateTime = OffsetDateTime.now()
+)

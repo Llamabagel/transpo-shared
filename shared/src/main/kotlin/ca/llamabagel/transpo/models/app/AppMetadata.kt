@@ -25,7 +25,9 @@ import java.time.OffsetDateTime
  * @property date The date at which this data object was generated.
  */
 @Serializable
-data class AppMetadata(val dataVersion: String,
-                       val dataSchemaVersion: Int,
-                       val latestAppVersion: String,
-                       @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime = OffsetDateTime.now())
+data class AppMetadata(
+        val dataVersion: String,
+        val dataSchemaVersion: Int,
+        val latestAppVersion: String,
+        @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime = OffsetDateTime.now()
+)

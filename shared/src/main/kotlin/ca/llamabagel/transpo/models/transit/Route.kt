@@ -17,9 +17,11 @@ import kotlinx.serialization.Serializable
  * @property color The colour to be used to display this route
  */
 @Serializable
-data class Route(val id: String,
-                 val shortName: String,
-                 val longName: String?,
-                 val type: Int,
-                 val serviceLevel: String,
-                 val color: String)
+data class Route(
+        val id: String,
+        val shortName: String,
+        val longName: String?,
+        val type: Int,
+        val serviceLevel: String,
+        val color: String
+)

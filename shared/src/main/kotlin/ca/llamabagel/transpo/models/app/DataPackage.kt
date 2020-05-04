@@ -23,10 +23,12 @@ import java.time.OffsetDateTime
  * @see Data
  */
 @Serializable
-data class DataPackage(val dataVersion: String,
-                       val schemaVersion: Int,
-                       @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime,
-                       val data: Data)
+data class DataPackage(
+        val dataVersion: String,
+        val schemaVersion: Int,
+        @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime,
+        val data: Data
+)
 
 /**
  * Data contained in a data package
@@ -44,7 +46,9 @@ data class DataPackage(val dataVersion: String,
  * @see RouteShape
  */
 @Serializable
-data class Data(val stops: List<Stop>,
-                val routes: List<Route>,
-                val stopRoutes: List<StopRoute>,
-                val shapes: List<RouteShape>)
+data class Data(
+        val stops: List<Stop>,
+        val routes: List<Route>,
+        val stopRoutes: List<StopRoute>,
+        val shapes: List<RouteShape>
+)

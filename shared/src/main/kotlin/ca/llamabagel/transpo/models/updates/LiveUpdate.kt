@@ -21,12 +21,14 @@ import java.time.OffsetDateTime
  * @property affectedStops A list of stops affected by this update
  */
 @Serializable
-data class LiveUpdate(val title: String,
-                      @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime,
-                      val category: String,
-                      val link: String,
-                      val description: String,
-                      val guid: String,
-                      val affectedRoutes: List<String> = emptyList(),
-                      val affectedStops: List<AffectedStop> = emptyList(),
-                      val featuredImageUrl: String? = null)
+data class LiveUpdate(
+        val title: String,
+        @Serializable(with = OffsetDateTimeSerializer::class) val date: OffsetDateTime,
+        val category: String,
+        val link: String,
+        val description: String,
+        val guid: String,
+        val affectedRoutes: List<String> = emptyList(),
+        val affectedStops: List<AffectedStop> = emptyList(),
+        val featuredImageUrl: String? = null
+)

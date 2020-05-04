@@ -13,5 +13,7 @@ import kotlinx.serialization.Serializable
  * @property longitude WGS 84 longitude (between -180 and 180)
  */
 @Serializable
-data class LatLng(val latitude: Double,
-                  val longitude: Double)
+data class LatLng(
+        val latitude: Double,
+        val longitude: Double
+)

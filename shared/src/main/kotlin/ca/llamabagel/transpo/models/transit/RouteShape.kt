@@ -15,6 +15,8 @@ import kotlinx.serialization.Serializable
  * @property shapeData The encoded polyline data.
  */
 @Serializable
-data class RouteShape(val routeId: String,
-                      val shapeId: String,
-                      val shapeData: String)
+data class RouteShape(
+        val routeId: String,
+        val shapeId: String,
+        val shapeData: String
+)
